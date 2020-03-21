@@ -45,12 +45,12 @@ class WinamaxSummary(TourneySummary):
 
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",     # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|" # legal currency symbols
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|" # legal currency symbols
                     }
     
-    re_Identify = re.compile(u"Winamax\sPoker\s\-\sTournament\ssummary")
+    re_Identify = re.compile("Winamax\sPoker\s\-\sTournament\ssummary")
     
-    re_SummaryTourneyInfo = re.compile(u"""\s:\s
+    re_SummaryTourneyInfo = re.compile("""\s:\s
                                            ((?P<LIMIT>No\sLimit|Limit|LIMIT|Pot\sLimit)\s)?
                                            (?P<GAME>.+)?
                                            \((?P<TOURNO>[0-9]+)\)(\s-\sLate\s(r|R)egistration)?\s+
@@ -82,13 +82,13 @@ class WinamaxSummary(TourneySummary):
 
     re_TourNo = re.compile("ID\=(?P<TOURNO>[0-9]+)")
 
-    re_Player = re.compile(u"""(?P<RANK>\d+)<\/td><td width="30%">(?P<PNAME>.+?)<\/td><td width="60%">(?P<WINNINGS>.+?)</td>""")
+    re_Player = re.compile("""(?P<RANK>\d+)<\/td><td width="30%">(?P<PNAME>.+?)<\/td><td width="60%">(?P<WINNINGS>.+?)</td>""")
 
-    re_Details = re.compile(u"""<p class="text">(?P<LABEL>.+?) : (?P<VALUE>.+?)</p>""")
-    re_Prizepool = re.compile(u"""<div class="title2">.+: (?P<PRIZEPOOL>[0-9,]+)""")
+    re_Details = re.compile("""<p class="text">(?P<LABEL>.+?) : (?P<VALUE>.+?)</p>""")
+    re_Prizepool = re.compile("""<div class="title2">.+: (?P<PRIZEPOOL>[0-9,]+)""")
 
     re_DateTime = re.compile("\[(?P<Y>[0-9]{4})\/(?P<M>[0-9]{2})\/(?P<D>[0-9]{2})[\- ]+(?P<H>[0-9]+):(?P<MIN>[0-9]+):(?P<S>[0-9]+)")
-    re_Ticket = re.compile(u""" / (?P<TTYPE>Ticket (?P<VALUE>[0-9.]+)&euro;|Tremplin Winamax Poker Tour|Starting Block Winamax Poker Tour|Finale Freeroll Mobile 2012|SNG Freeroll Mobile 2012)""")
+    re_Ticket = re.compile(""" / (?P<TTYPE>Ticket (?P<VALUE>[0-9.]+)&euro;|Tremplin Winamax Poker Tour|Starting Block Winamax Poker Tour|Finale Freeroll Mobile 2012|SNG Freeroll Mobile 2012)""")
 
     codepage = ("utf8", "cp1252")
 
@@ -119,8 +119,8 @@ class WinamaxSummary(TourneySummary):
                 mg = m.groupdict()
                 #print mg
                 if mg['LABEL'] == 'Buy-in':
-                    mg['VALUE'] = mg['VALUE'].replace(u"&euro;", "")
-                    mg['VALUE'] = mg['VALUE'].replace(u"+", "")
+                    mg['VALUE'] = mg['VALUE'].replace("&euro;", "")
+                    mg['VALUE'] = mg['VALUE'].replace("+", "")
                     mg['VALUE'] = mg['VALUE'].strip(" $")
                     bi, fee = mg['VALUE'].split(" ")
                     self.buyin = int(100*Decimal(bi))
@@ -138,7 +138,7 @@ class WinamaxSummary(TourneySummary):
         for m in self.re_Prizepool.finditer(str(div)):
             mg = m.groupdict()
             #print mg
-            self.prizepool = mg['PRIZEPOOL'].replace(u',','.')
+            self.prizepool = mg['PRIZEPOOL'].replace(',','.')
             
 
         for m in self.re_GameType.finditer(str(tl[0])):
@@ -232,7 +232,7 @@ class WinamaxSummary(TourneySummary):
                 self.fee = 0
                 self.buyinCurrency = "FREE"
             else:
-                if mg['BUYIN'].find(u"€")!=-1:
+                if mg['BUYIN'].find("€")!=-1:
                     self.buyinCurrency="EUR"
                 elif mg['BUYIN'].find("FPP")!=-1:
                     self.buyinCurrency="WIFP"
@@ -285,7 +285,7 @@ class WinamaxSummary(TourneySummary):
                 koCount = None
     
                 if 'WINNINGS' in mg and mg['WINNINGS'] != None:
-                    if mg['WINNINGS'].find(u"€")!=-1:
+                    if mg['WINNINGS'].find("€")!=-1:
                         self.currency="EUR"
                     elif mg['WINNINGS'].find("FPP")!=-1:
                         self.currency="WIFP"

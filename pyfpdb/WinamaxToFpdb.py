@@ -32,9 +32,9 @@ from decimal_wrapper import Decimal
 class Winamax(HandHistoryConverter):
     def Trace(f):
         def my_f(*args, **kwds):
-            print ( "entering " +  f.__name__)
+            print(( "entering " +  f.__name__))
             result= f(*args, **kwds)
-            print ( "exiting " +  f.__name__)
+            print(( "exiting " +  f.__name__))
             return result
         my_f.__name = f.__name__
         my_f.__doc__ = f.__doc__
@@ -47,10 +47,10 @@ class Winamax(HandHistoryConverter):
     siteId   = 15 # Needs to match id entry in Sites database
 
     mixes = { } # Legal mixed games
-    sym = {'USD': "\$", 'CAD': "\$", 'T$': "", "EUR": u"\xe2\x82\xac|\u20ac", "GBP": "\xa3", "play": ""}         # ADD Euro, Sterling, etc HERE
+    sym = {'USD': "\$", 'CAD': "\$", 'T$': "", "EUR": "\xe2\x82\xac|\u20ac", "GBP": "\xa3", "play": ""}         # ADD Euro, Sterling, etc HERE
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",     # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|" # legal currency symbols - Euro(cp1252, utf-8)
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|" # legal currency symbols - Euro(cp1252, utf-8)
                     }
 
     limits = { 'no limit':'nl', 'pot limit' : 'pl', 'fixed limit':'fl'}
@@ -75,14 +75,14 @@ class Winamax(HandHistoryConverter):
 
     # Static regexes
     # ***** End of hand R5-75443872-57 *****
-    re_Identify = re.compile(u'Winamax\sPoker\s\-\s(CashGame|Go\sFast|Tournament\s\")')
+    re_Identify = re.compile('Winamax\sPoker\s\-\s(CashGame|Go\sFast|Tournament\s\")')
     re_SplitHands = re.compile(r'\n\n')
 
 
 
 # Winamax Poker - CashGame - HandId: #279823-223-1285031451 - Holdem no limit (0.02€/0.05€) - 2010/09/21 03:10:51 UTC
 # Table: 'Charenton-le-Pont' 9-max (real money) Seat #5 is the button
-    re_HandInfo = re.compile(u"""
+    re_HandInfo = re.compile("""
             \s*Winamax\sPoker\s-\s
             (?P<RING>(CashGame|Go\sFast\s"[^"]+"))?
             (?P<TOUR>Tournament\s
@@ -124,8 +124,8 @@ class Winamax(HandHistoryConverter):
 # Seat 1: some_player (5€)
 # Seat 2: some_other_player21 (6.33€)
 
-    re_PlayerInfo        = re.compile(u'Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.*)\s\((%(LS)s)?(?P<CASH>[.0-9]+)(%(LS)s)?\)' % substitutions)
-    re_PlayerInfoSummary = re.compile(u'Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.+?)\s' % substitutions)
+    re_PlayerInfo        = re.compile('Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.*)\s\((%(LS)s)?(?P<CASH>[.0-9]+)(%(LS)s)?\)' % substitutions)
+    re_PlayerInfoSummary = re.compile('Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.+?)\s' % substitutions)
 
     def compilePlayerRegexs(self, hand):
         players = set([player[1] for player in hand.players])
@@ -266,8 +266,8 @@ class Winamax(HandHistoryConverter):
                     hand.tablename = info['TABLENO']
                     hand.roundPenny = True
                 # TODO: long-term solution for table naming on Winamax.
-                if hand.tablename.endswith(u'No Limit Hold\'em'):
-                    hand.tablename = hand.tablename[:-len(u'No Limit Hold\'em')] + u'NLHE'
+                if hand.tablename.endswith('No Limit Hold\'em'):
+                    hand.tablename = hand.tablename[:-len('No Limit Hold\'em')] + 'NLHE'
             if key == 'MAXPLAYER' and info[key] != None:
                 hand.maxseats = int(info[key])
 
@@ -278,7 +278,7 @@ class Winamax(HandHistoryConverter):
                     #print "DEBUG: info['BIRAKE']: %s" % info['BIRAKE']
                     #print "DEBUG: info['BOUNTY']: %s" % info['BOUNTY']
                     for k in ['BIAMT','BIRAKE']:
-                        if k in info.keys() and info[k]:
+                        if k in list(info.keys()) and info[k]:
                             info[k] = info[k].replace(',','.')
 
                     if info['FREETICKET'] is not None:
@@ -288,7 +288,7 @@ class Winamax(HandHistoryConverter):
                     else:
                         if info[key].find("$")!=-1:
                             hand.buyinCurrency="USD"
-                        elif info[key].find(u"€")!=-1:
+                        elif info[key].find("€")!=-1:
                             hand.buyinCurrency="EUR"
                         elif info[key].find("FPP")!=-1:
                             hand.buyinCurrency="WIFP"
@@ -300,7 +300,7 @@ class Winamax(HandHistoryConverter):
                             hand.buyinCurrency="play"
 
                         if info['BIAMT'] is not None:
-                            info['BIAMT'] = info['BIAMT'].strip(u'$€FPP')
+                            info['BIAMT'] = info['BIAMT'].strip('$€FPP')
                         else:
                             info['BIAMT'] = 0
 
@@ -310,13 +310,13 @@ class Winamax(HandHistoryConverter):
                                 tmp = info['BOUNTY']
                                 info['BOUNTY'] = info['BIRAKE']
                                 info['BIRAKE'] = tmp
-                                info['BOUNTY'] = info['BOUNTY'].strip(u'$€') # Strip here where it isn't 'None'
+                                info['BOUNTY'] = info['BOUNTY'].strip('$€') # Strip here where it isn't 'None'
                                 hand.koBounty = int(100*Decimal(info['BOUNTY']))
                                 hand.isKO = True
                             else:
                                 hand.isKO = False
 
-                            info['BIRAKE'] = info['BIRAKE'].strip(u'$€')
+                            info['BIRAKE'] = info['BIRAKE'].strip('$€')
 
                             # TODO: Is this correct? Old code tried to
                             # conditionally multiply by 100, but we
@@ -352,7 +352,7 @@ class Winamax(HandHistoryConverter):
                 hand.addPlayer(int(a.group('SEAT')), a.group('PNAME'), a.group('CASH'))
                 plist[a.group('PNAME')] = [int(a.group('SEAT')), a.group('CASH')]
                 
-        if len(plist.keys()) < 2:
+        if len(list(plist.keys())) < 2:
             raise FpdbHandPartial(_("Less than 2 players in hand! %s.") % hand.handid)
 
     def markStreets(self, hand):
@@ -416,7 +416,7 @@ class Winamax(HandHistoryConverter):
             #hand.addBlind(None, None, None)
         for a in self.re_PostBB.finditer(hand.handText):
             hand.addBlind(a.group('PNAME'), 'big blind', a.group('BB'))
-            amount = Decimal(a.group('BB').replace(u',', u''))
+            amount = Decimal(a.group('BB').replace(',', ''))
             hand.lastBet['PREFLOP'] = amount
         for a in self.re_PostDead.finditer(hand.handText):
             #print "DEBUG: Found dead blind: addBlind(%s, 'secondsb', %s)" %(a.group('PNAME'), a.group('DEAD'))
@@ -445,7 +445,7 @@ class Winamax(HandHistoryConverter):
         # streets PREFLOP, PREDRAW, and THIRD are special cases beacause
         # we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL', 'BLINDSANTES'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
                     newcards = [c for c in found.group('NEWCARDS').split(' ') if c != 'X']
@@ -456,7 +456,7 @@ class Winamax(HandHistoryConverter):
                         hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
                         log.debug(_("Hero cards %s: %s") % (hand.hero, newcards))
                     
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL', 'BLINDSANTES'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             for found in m:

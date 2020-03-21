@@ -268,7 +268,7 @@ class Filters(QWidget):
         return self.siteid
 
     def getHeroes(self):
-        return dict([(site, unicode(self.leHeroes[site].text())) for site in self.leHeroes])
+        return dict([(site, str(self.leHeroes[site].text())) for site in self.leHeroes])
 
     def getGraphOps(self):
         return [g for g in self.cbGraphops if self.cbGraphops[g].isChecked()]
@@ -385,11 +385,11 @@ class Filters(QWidget):
         pass
 
     def __set_checkboxes(self, checkState, checkBoxes, setState):
-        for checkbox in checkBoxes.values():
+        for checkbox in list(checkBoxes.values()):
             checkbox.setChecked(setState)
 
     def __select_limit(self, checkState, limit):
-        for l, checkbox in self.cbLimits.items():
+        for l, checkbox in list(self.cbLimits.items()):
             if l.endswith(limit):
                 checkbox.setChecked(True)
 
@@ -443,7 +443,7 @@ class Filters(QWidget):
                 vbox1.addLayout(hbox)
                 self.createTourneyTypeLine(hbox, line[0])
         else:
-            print _("INFO: No tourney types returned from database")
+            print(_("INFO: No tourney types returned from database"))
             log.info(_("No tourney types returned from database"))
 
     def fillGamesFrame(self, frame):
@@ -476,7 +476,7 @@ class Filters(QWidget):
                 hbox.addWidget(btnNone)
                 hbox.addStretch()
         else:
-            print _("INFO: No games returned from database")
+            print(_("INFO: No games returned from database"))
             log.info(_("No games returned from database"))
     
     def fillPositionsFrame(self, frame, display):
@@ -535,7 +535,7 @@ class Filters(QWidget):
                 hbox.addWidget(btnNone)
                 hbox.addStretch()
         else:
-            print(_("INFO") + ": " + _("No positions returned from database"))
+            print((_("INFO") + ": " + _("No positions returned from database")))
             log.info(_("No positions returned from database"))
 
     def fillHoleCardsFrame(self, frame):
@@ -649,7 +649,7 @@ class Filters(QWidget):
 
                 hbox.addStretch()
         else:
-            print _("INFO: No games returned from database")
+            print(_("INFO: No games returned from database"))
             log.info(_("No games returned from database"))
 
         if "Type" in display and display["Type"] and 'ring' in types_found and 'tour' in types_found:

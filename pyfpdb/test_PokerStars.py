@@ -56,19 +56,19 @@ def checkGameInfo(hhc, header, info):
 def testGameInfo():
     hhc = PokerStarsToFpdb.PokerStars(config, autostart=False)
     pairs = (
-    (u"PokerStars Game #20461877044:  Hold'em No Limit ($1/$2) - 2008/09/16 18:58:01 ET",
+    ("PokerStars Game #20461877044:  Hold'em No Limit ($1/$2) - 2008/09/16 18:58:01 ET",
     {'type':'ring', 'base':"hold", 'category':'holdem', 'limitType':'nl', 'sb':'1', 'bb':'2', 'currency':'USD'}),
          
-    (u"PokerStars Game #5999635897:  HORSE (Omaha Hi/Lo Limit, $2/$4) - 2006/08/21 - 13:59:19 (ET)",
+    ("PokerStars Game #5999635897:  HORSE (Omaha Hi/Lo Limit, $2/$4) - 2006/08/21 - 13:59:19 (ET)",
     {'type':'ring', 'base':'hold', 'category':'omahahilo', 'limitType':'fl', 'sb':'2', 'bb':'4','currency':'USD'}),
 
-    (u"PokerStars Game #25923772706:  Badugi Limit ($0.25/$0.50) - 2009/03/13 16:40:58 ET",
+    ("PokerStars Game #25923772706:  Badugi Limit ($0.25/$0.50) - 2009/03/13 16:40:58 ET",
     {'type':'ring', 'base':'draw', 'category':'badugi', 'limitType':'fl', 'sb':'0.25', 'bb':'0.50','currency':'USD'}),
 
-    (u"PokerStars Game #22073591924:  Hold'em No Limit ($0.50/$1.00) - 2008/11/16 1:22:21 CET [2008/11/15 19:22:21 ET]",
+    ("PokerStars Game #22073591924:  Hold'em No Limit ($0.50/$1.00) - 2008/11/16 1:22:21 CET [2008/11/15 19:22:21 ET]",
     {'type':'ring', 'base':'hold', 'category':'holdem', 'limitType':'nl', 'sb':'0.50', 'bb':'1.00','currency':'USD'}),
 
-    (u"PokerStars Game #25974627364:  Omaha Pot Limit ($0.05/$0.10) - 2009/03/15 0:29:00 ET",
+    ("PokerStars Game #25974627364:  Omaha Pot Limit ($0.05/$0.10) - 2009/03/15 0:29:00 ET",
     {'type':'ring', 'base':'hold', 'category':'omahahi', 'limitType':'pl', 'sb':'0.05', 'bb':'0.10','currency':'USD'})
     )
     for (header, info) in pairs:
@@ -101,7 +101,7 @@ def testFlopImport():
             """regression-test-files/cash/Stars/Flop/NLHE-6max-USD-0.05-0.10-200912.Allin-pre.txt""", site="PokerStars")
     importer.setCallHud(False)
     (stored, dups, partial, errs, ttime) = importer.runImport()
-    print "DEBUG: stored: %s dups: %s partial: %s errs: %s ttime: %s" %(stored, dups, partial, errs, ttime)
+    print("DEBUG: stored: %s dups: %s partial: %s errs: %s ttime: %s" %(stored, dups, partial, errs, ttime))
     importer.clearFileList()
 
     col = { 'sawShowdown': 2, 'street0Aggr':3
@@ -128,7 +128,7 @@ and s.id = p.siteid"""
     c.execute(q)
     result = c.fetchall()
     for row, data in enumerate(result):
-        print "DEBUG: result[%s]: %s" %(row, result[row])
+        print("DEBUG: result[%s]: %s" %(row, result[row]))
         # Assert if any sawShowdown = True
         assert result[row][col['sawShowdown']] == 0
 
@@ -152,9 +152,9 @@ and s.id = p.siteid"""
     c = db.get_cursor()
     c.execute(q) 
     result = c.fetchall()
-    pstats = { u'Kinewma':0, u'Arbaz':0, u's0rrow':1, u'bys7':0, u'AAALISAAAA':1, u'Bl\xe5veis':0 }
+    pstats = { 'Kinewma':0, 'Arbaz':0, 's0rrow':1, 'bys7':0, 'AAALISAAAA':1, 'Bl\xe5veis':0 }
     for row, data in enumerate(result):
-        print "DEBUG: result[%s]: %s == %s" %(row, result[row], pstats[data[1]])
+        print("DEBUG: result[%s]: %s == %s" %(row, result[row], pstats[data[1]]))
         assert result[row][col['sawShowdown']] == pstats[data[1]]
 
     assert 0 == 1

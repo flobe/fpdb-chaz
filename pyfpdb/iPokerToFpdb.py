@@ -58,7 +58,7 @@ class iPoker(HandHistoryConverter):
     summaryInFile = True
 
     substitutions = {
-                     'LS'  : u"\$|\xe2\x82\xac|\xe2\u201a\xac|\u20ac|\xc2\xa3|\£|RSD|",
+                     'LS'  : "\$|\xe2\x82\xac|\xe2\u201a\xac|\u20ac|\xc2\xa3|\£|RSD|",
                      'PLYR': r'(?P<PNAME>[^"]+)',
                      'NUM' : r'.,\d',
                     }
@@ -67,7 +67,7 @@ class iPoker(HandHistoryConverter):
                   'Limit':'fl',
                      'NL':'nl',
                      'SL':'nl',
-                    u'БЛ':'nl',
+                    'БЛ':'nl',
                      'PL':'pl',
                      'LP':'pl',
                       'L':'fl',
@@ -83,7 +83,7 @@ class iPoker(HandHistoryConverter):
                 'Omaha Hi-Lo' : ('hold','omahahilo'),
             }
 
-    currencies = { u'€':'EUR', '$':'USD', '':'T$', u'£':'GBP', 'RSD': 'RSD'}
+    currencies = { '€':'EUR', '$':'USD', '':'T$', '£':'GBP', 'RSD': 'RSD'}
     
     # translations from captured groups to fpdb info strings
     Lim_Blinds = {      '0.04': ('0.01', '0.02'),         '0.08': ('0.02', '0.04'),
@@ -139,10 +139,10 @@ class iPoker(HandHistoryConverter):
     months = { 'Jan':1, 'Feb':2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7, 'Aug':8, 'Sep':9, 'Oct':10, 'Nov':11, 'Dec':12}
 
     # Static regexes
-    re_Identify = re.compile(u'<game\sgamecode=')
+    re_Identify = re.compile('<game\sgamecode=')
     re_SplitHands = re.compile(r'</game>')
     re_TailSplitHands = re.compile(r'(</game>)')
-    re_GameInfo = re.compile(ur"""
+    re_GameInfo = re.compile(r"""
             <gametype>(?P<GAME>((?P<CATEGORY>(5|7)\sCard\sStud(\sHi\-Lo)?|(Six\sPlus\s)?Holdem|Omaha(\sHi\-Lo)?)?\s?(?P<LIMIT>NL|SL|L|LZ|PL|БЛ|LP|No\slimit|Pot\slimit|Limit))|LH\s(?P<LSB>[%(NUM)s]+)/(?P<LBB>[%(NUM)s]+).+?)
             (\s(%(LS)s)?(?P<SB>[%(NUM)s]+)/(%(LS)s)?(?P<BB>[%(NUM)s]+))?(\sAnte\s(%(LS)s)?(?P<ANTE>[%(NUM)s]+))?</gametype>\s+?
             <tablename>(?P<TABLE>.+)?</tablename>\s+?
@@ -457,7 +457,7 @@ class iPoker(HandHistoryConverter):
         for a in m:
             if a.group('ATYPE') == '2':
                 blinds[int(a.group('ACT'))] = a.groupdict()
-        for b in sorted(blinds.iterkeys()):
+        for b in sorted(blinds.keys()):
             type = 'big blind'
             blind = blinds[b]
             if not hand.gametype['bb']:
@@ -497,7 +497,7 @@ class iPoker(HandHistoryConverter):
 #    we need to grab hero's cards
 
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
                     player = found.group('PNAME')
@@ -508,7 +508,7 @@ class iPoker(HandHistoryConverter):
                     hand.addHoleCards(street, player, closed=cards, shown=True, mucked=False, dealt=True)
         
         
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             for found in m:
@@ -538,7 +538,7 @@ class iPoker(HandHistoryConverter):
         actions = {}
         for a in m:
             actions[int(a.group('ACT'))] = a.groupdict()
-        for a in sorted(actions.iterkeys()):
+        for a in sorted(actions.keys()):
             action = actions[a]
             atype = action['ATYPE']
             player = action['PNAME']
@@ -576,7 +576,7 @@ class iPoker(HandHistoryConverter):
 
     def readCollectPot(self, hand):
         hand.setUncalledBets(self.uncalledbets)
-        for pname, pot in self.playerWinnings.iteritems():
+        for pname, pot in self.playerWinnings.items():
             hand.addCollectPot(player=pname, pot=self.clearMoneyString(pot))
 
     def readShownCards(self, hand):

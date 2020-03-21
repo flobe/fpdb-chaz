@@ -28,11 +28,11 @@ from TourneySummary import *
 
 class iPokerSummary(TourneySummary):
     substitutions = {
-                     'LS'  : u"\$|\xe2\x82\xac|\xe2\u201a\xac|\u20ac|\xc2\xa3|\£|RSD|",
+                     'LS'  : "\$|\xe2\x82\xac|\xe2\u201a\xac|\u20ac|\xc2\xa3|\£|RSD|",
                      'PLYR': r'(?P<PNAME>[^"]+)',
                      'NUM' : r'.,0-9',
                     }
-    currencies = { u'€':'EUR', '$':'USD', '':'T$', u'£':'GBP', 'RSD': 'RSD'}
+    currencies = { '€':'EUR', '$':'USD', '':'T$', '£':'GBP', 'RSD': 'RSD'}
 
     months = { 'Jan':1, 'Feb':2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7, 'Aug':8, 'Sep':9, 'Oct':10, 'Nov':11, 'Dec':12}
     
@@ -41,7 +41,7 @@ class iPokerSummary(TourneySummary):
                   'Limit':'fl',
                      'NL':'nl',
                      'SL':'nl',
-                    u'БЛ':'nl',
+                    'БЛ':'nl',
                      'PL':'pl',
                      'LP':'pl',
                       'L':'fl',
@@ -57,9 +57,9 @@ class iPokerSummary(TourneySummary):
                 'Omaha Hi-Lo' : ('hold','omahahilo'),
             }
     
-    re_Identify = re.compile(u'<game\sgamecode=')
+    re_Identify = re.compile('<game\sgamecode=')
 
-    re_GameType = re.compile(ur"""
+    re_GameType = re.compile(r"""
             <gametype>(?P<GAME>((?P<CATEGORY>(5|7)\sCard\sStud(\sHi\-Lo)?|(Six\sPlus\s)?Holdem|Omaha(\sHi\-Lo)?)?\s?(?P<LIMIT>NL|SL|L|LZ|PL|БЛ|LP|No\slimit|Pot\slimit|Limit))|LH\s(?P<LSB>[%(NUM)s]+)/(?P<LBB>[%(NUM)s]+).+?)
             (\s(%(LS)s)?(?P<SB>[%(NUM)s]+)/(%(LS)s)?(?P<BB>[%(NUM)s]+))?(\sAnte\s(%(LS)s)?(?P<ANTE>[%(NUM)s]+))?</gametype>\s+?
             <tablename>(?P<TABLE>.+)?</tablename>\s+?

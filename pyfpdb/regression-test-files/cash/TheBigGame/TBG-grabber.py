@@ -4,7 +4,7 @@
 """Script to fetch all the of the data file from thebiggame.pokerstars.net"""
 #wget http://thebiggame.pokerstars.net/data/s1/w12/d2/d12h60.js
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 def generate_url_list(week, day, hand):
     subst = { 'week': week, 'day': day, 'hand': hand }
@@ -22,9 +22,9 @@ def modify_url_list(urls):
 
 def fetch_url_list(urls):
     for url in urls:
-        print "URL: %s" % url
-        data = urllib2.urlopen(url).read()
-        print data
+        print("URL: %s" % url)
+        data = urllib.request.urlopen(url).read()
+        print(data)
 
 def get_all_data():
     s1w1 =  [(1,32), (33,57), (58,85), (86,121), (122,150)]
@@ -45,7 +45,7 @@ def get_all_data():
     urllist = []
 
     for i, week in enumerate(season1, start = 1):
-        print "Total: %s" % count
+        print("Total: %s" % count)
         for j, days in enumerate(week, start = 1):
             start_hand, end_hand = days
             for k in range(start_hand, end_hand+1):
@@ -55,7 +55,7 @@ def get_all_data():
     urllist = modify_url_list(urllist)
     fetch_url_list(urllist)
 
-    print "Total: %s" % count
+    print("Total: %s" % count)
 
 def main():
     get_all_data()

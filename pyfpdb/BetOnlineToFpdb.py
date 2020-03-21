@@ -40,9 +40,9 @@ class BetOnline(HandHistoryConverter):
     siteId   = 19 # Needs to match id entry in Sites database
     sym = {'USD': "\$", 'CAD': "\$", 'T$': "", "EUR": "\xe2\x82\xac", "GBP": "\xa3", "play": ""}         # ADD Euro, Sterling, etc HERE
     substitutions = {
-                     'LS' : u"\$|\xe2\x82\xac|\u20ac|", # legal currency symbols - Euro(cp1252, utf-8)
+                     'LS' : "\$|\xe2\x82\xac|\u20ac|", # legal currency symbols - Euro(cp1252, utf-8)
                      'PLYR': r'(?P<PNAME>.+?)',
-                     'NUM' :u".,\d",
+                     'NUM' :".,\d",
                     }
                     
     # translations from captured groups to fpdb info strings
@@ -89,7 +89,7 @@ class BetOnline(HandHistoryConverter):
                         'Mixed Hold\'em': 'mholdem',
                            'Triple Stud': '3stud'
                } # Legal mixed games
-    currencies = { u'€':'EUR', '$':'USD', '':'T$' }
+    currencies = { '€':'EUR', '$':'USD', '':'T$' }
     
     skins = {
                        'BetOnline Poker': 'BetOnline',
@@ -101,7 +101,7 @@ class BetOnline(HandHistoryConverter):
                } # Legal mixed games
 
     # Static regexes
-    re_GameInfo     = re.compile(u"""
+    re_GameInfo     = re.compile("""
           (?P<SKIN>BetOnline\sPoker|PayNoRake|ActionPoker\.com|Gear\sPoker|SportsBetting\.ag\sPoker|Tiger\sGaming)\sGame\s\#(?P<HID>[0-9]+):\s+
           (\{.*\}\s+)?(Tournament\s\#                # open paren of tournament info
           (?P<TOURNO>\d+):\s?
@@ -121,7 +121,7 @@ class BetOnline(HandHistoryConverter):
           (?P<DATETIME>.*$)
         """ % substitutions, re.MULTILINE|re.VERBOSE)
 
-    re_PlayerInfo   = re.compile(u"""
+    re_PlayerInfo   = re.compile("""
           ^Seat\s(?P<SEAT>[0-9]+):\s
           (?P<PNAME>.*)\s
           \((%(LS)s)?(?P<CASH>[%(NUM)s]+)\sin\s[cC]hips\)""" % substitutions, 
@@ -140,7 +140,7 @@ class BetOnline(HandHistoryConverter):
           (Seat\s\#(?P<BUTTON>\d+)\sis\sthe\sbutton)?""", 
           re.MULTILINE|re.VERBOSE)
 
-    re_Identify     = re.compile(u'(BetOnline\sPoker|PayNoRake|ActionPoker\.com|Gear\sPoker|SportsBetting\.ag\sPoker|Tiger\sGaming)\sGame\s\#\d+')
+    re_Identify     = re.compile('(BetOnline\sPoker|PayNoRake|ActionPoker\.com|Gear\sPoker|SportsBetting\.ag\sPoker|Tiger\sGaming)\sGame\s\#\d+')
     re_SplitHands   = re.compile('\n\n\n+')
     re_TailSplitHands   = re.compile('(\n\n\n+)')
     re_Button       = re.compile('Seat #(?P<BUTTON>\d+) is the button', re.MULTILINE)
@@ -320,7 +320,7 @@ class BetOnline(HandHistoryConverter):
                     else:
                         if info[key].find("$")!=-1:
                             hand.buyinCurrency="USD"
-                        elif info[key].find(u"€")!=-1:
+                        elif info[key].find("€")!=-1:
                             hand.buyinCurrency="EUR"
                         elif re.match("^[0-9+]*$", info[key]):
                             hand.buyinCurrency="play"
@@ -328,19 +328,19 @@ class BetOnline(HandHistoryConverter):
                             #FIXME: handle other currencies, play money
                             raise FpdbParseError(_("BetOnlineToFpdb.readHandInfo: Failed to detect currency.") + " " + _("Hand ID") + ": %s: '%s'" % (hand.handid, info[key]))
 
-                        info['BIAMT'] = info['BIAMT'].strip(u'$€')
+                        info['BIAMT'] = info['BIAMT'].strip('$€')
                         if info['BOUNTY'] != None:
                             # There is a bounty, Which means we need to switch BOUNTY and BIRAKE values
                             tmp = info['BOUNTY']
                             info['BOUNTY'] = info['BIRAKE']
                             info['BIRAKE'] = tmp
-                            info['BOUNTY'] = info['BOUNTY'].strip(u'$€') # Strip here where it isn't 'None'
+                            info['BOUNTY'] = info['BOUNTY'].strip('$€') # Strip here where it isn't 'None'
                             hand.koBounty = int(100*Decimal(info['BOUNTY']))
                             hand.isKO = True
                         else:
                             hand.isKO = False
 
-                        info['BIRAKE'] = info['BIRAKE'].strip(u'$€')
+                        info['BIRAKE'] = info['BIRAKE'].strip('$€')
 
                         hand.buyin = int(100*Decimal(info['BIAMT']))
                         hand.fee = int(100*Decimal(info['BIRAKE']))
@@ -507,7 +507,7 @@ class BetOnline(HandHistoryConverter):
                 if self.Lim_Blinds.get(BB) != None:
                     hand.gametype['sb'] = self.Lim_Blinds.get(BB)[0]
             elif hand.gametype['bb'] == None and hand.gametype['sb'] != None:
-                for k, v in self.Lim_Blinds.iteritems():
+                for k, v in self.Lim_Blinds.items():
                     if hand.gametype['sb'] == v[0]:
                         hand.gametype['bb'] = v[1]
             if hand.gametype['sb'] == None or hand.gametype['bb'] == None:
@@ -527,7 +527,7 @@ class BetOnline(HandHistoryConverter):
 #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
 #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
 #                    if m == None:
@@ -538,7 +538,7 @@ class BetOnline(HandHistoryConverter):
                     newcards = [c[:-1].replace('10', 'T') + c[-1].lower() for c in newcards]
                     hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
 
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             for found in m:

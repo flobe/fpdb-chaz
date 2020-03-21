@@ -40,15 +40,15 @@ class PokerTrackerSummary(TourneySummary):
 
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",      # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|\£|P|SC|", # legal currency symbols - Euro(cp1252, utf-8)
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|\£|P|SC|", # legal currency symbols - Euro(cp1252, utf-8)
                            'PLYR': r'(?P<PNAME>.+?)',
-                           'NUM' : u".,\d",
-                            'CUR': u"(\$|\xe2\x82\xac|\u20ac||\£|)",
+                           'NUM' : ".,\d",
+                            'CUR': "(\$|\xe2\x82\xac|\u20ac||\£|)",
                     }
 
-    re_Identify = re.compile(u"PokerTracker")
+    re_Identify = re.compile("PokerTracker")
 
-    re_TourneyInfo = re.compile(u"""
+    re_TourneyInfo = re.compile("""
                         \s(3|4)\sTournament\sSummary\s+
                         Site:\s(?P<SITE>.+?)\s+
                         Game:\s(?P<GAME>Holdem|Texas\sHold\'em|Omaha|Omaha\sHi|Omaha\sHi/Lo)\s+
@@ -70,7 +70,7 @@ class PokerTrackerSummary(TourneySummary):
     re_Speed = re.compile("(?P<SPEED>Turbo|Hyper\-Turbo)")
     re_Sng = re.compile("\s(?P<SNG>SNG)\s")
 
-    re_Player = re.compile(u"""
+    re_Player = re.compile("""
         Place:\s(?P<RANK>[0-9]+),\s
         Player:\s(?P<NAME>.*),\s
         Won:\s(?P<CUR>[%(LS)s]?)(?P<WINNINGS>[,.0-9]+),
@@ -168,7 +168,7 @@ class PokerTrackerSummary(TourneySummary):
         self.startTime = datetime.datetime.strptime(datetimestr, "%Y/%m/%d %H:%M:%S") # also timezone at end, e.g. " ET"
 
         if mg['CURRENCY'] == "$":     self.buyinCurrency="USD"
-        elif mg['CURRENCY'] == u"€":  self.buyinCurrency="EUR"
+        elif mg['CURRENCY'] == "€":  self.buyinCurrency="EUR"
         elif mg['CURRENCY'] in ("SC","P"): self.buyinCurrency="PSFP"
         elif not mg['CURRENCY']:      self.buyinCurrency="play"
         if self.buyin == 0:           self.buyinCurrency="FREE"
@@ -202,7 +202,7 @@ class PokerTrackerSummary(TourneySummary):
                     
                 if 'CUR' in mg and mg['CUR'] != None:
                     if mg['CUR'] == "$":     self.currency="USD"
-                    elif mg['CUR'] == u"€":  self.currency="EUR"
+                    elif mg['CUR'] == "€":  self.currency="EUR"
                     elif mg['CUR'] in ("P","SC"):   self.currency="PSFP"
     
                 if rank==0:

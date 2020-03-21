@@ -68,7 +68,7 @@ class Boss(HandHistoryConverter):
                                     (TABLETOURNEYID=".*?"\s)?
                                     WIN="[.0-9]+"\sLOSS="[.0-9]+"
                                     """, re.MULTILINE| re.VERBOSE)
-    re_Identify     = re.compile(u'<HISTORY\sID="\d+"\sSESSION=')
+    re_Identify     = re.compile('<HISTORY\sID="\d+"\sSESSION=')
     re_SplitHands   = re.compile('</HISTORY>')
     re_Button       = re.compile('<ACTION TYPE="HAND_DEAL" PLAYER="(?P<BUTTON>[^"]+)">\n<CARD LINK="[0-9b]+"></CARD>\n<CARD LINK="[0-9b]+"></CARD></ACTION>\n<ACTION TYPE="ACTION_', re.MULTILINE)
     re_PlayerInfo   = re.compile('^<PLAYER NAME="(?P<PNAME>.+)" SEAT="(?P<SEAT>[0-9]+)" AMOUNT="(?P<CASH>[.0-9]+)"( STATE="(?P<STATE>STATE_EMPTY|STATE_PLAYING|STATE_SITOUT)" DEALER="(Y|N)")?></PLAYER>', re.MULTILINE)
@@ -298,7 +298,7 @@ class Boss(HandHistoryConverter):
 #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
 #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 newcards = []
                 for found in m:
@@ -397,7 +397,7 @@ class Boss(HandHistoryConverter):
                 hand.addCheck( street, action.group('PNAME'))
             elif action.group('ATYPE') == 'ACTION_CALL':
                 bet = action.group('BET') 
-                if Decimal(bet.replace(u',', u''))< hand.lastBet[street]:
+                if Decimal(bet.replace(',', ''))< hand.lastBet[street]:
                     hand.addCall(street, action.group('PNAME'), bet )
                 else:
                     hand.addCallTo(street, action.group('PNAME'), bet )
@@ -414,7 +414,7 @@ class Boss(HandHistoryConverter):
                 bet = action.group('BET')
                 player = action.group('PNAME')
                 hand.checkPlayerExists(action.group('PNAME'), 'addAllIn')
-                bet = bet.replace(u',', u'') #some sites have commas
+                bet = bet.replace(',', '') #some sites have commas
                 Ai = Decimal(bet)
                 Bp = hand.lastBet[street]
                 if Ai <= Bp:
@@ -430,12 +430,12 @@ class Boss(HandHistoryConverter):
     def calculateAntes(self, street, hand):
         if street in ('PREFLOP', 'DEAL'):
             contributed = sum(hand.pot.committed.values()) + sum(hand.pot.common.values())
-            committed = sorted([ (v,k) for (k,v) in hand.pot.committed.items()])
+            committed = sorted([ (v,k) for (k,v) in list(hand.pot.committed.items())])
             try:
                 lastbet = committed[-1][0] - committed[-2][0]
                 if lastbet > 0: # uncalled
                     contributed -= lastbet
-            except IndexError, e:
+            except IndexError as e:
                 log.error(_("BossToFpdb.calculateAntes(): '%s': Major failure while calculating pot: '%s'") % (self.handid, e))
                 raise FpdbParseError
             if street=='DEAL':

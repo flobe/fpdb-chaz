@@ -34,17 +34,17 @@ try:
     if calluse:
         try:
             matplotlib.use('qt5agg')
-        except ValueError, e:
-            print e
+        except ValueError as e:
+            print(e)
     from matplotlib.figure import Figure
     from matplotlib.backends.backend_qt5agg import FigureCanvas
     from matplotlib.finance import candlestick_ochl
 
     from numpy import diff, nonzero, sum, cumsum, max, min, append
 
-except ImportError, inst:
-    print _("""Failed to load numpy and/or matplotlib in Session Viewer""")
-    print "ImportError: %s" % inst.args
+except ImportError as inst:
+    print(_("""Failed to load numpy and/or matplotlib in Session Viewer"""))
+    print("ImportError: %s" % inst.args)
 
 import Card
 import Database
@@ -177,19 +177,19 @@ class GuiSessionViewer(QSplitter):
 
         if not sitenos:
             #Should probably pop up here.
-            print _("No sites selected - defaulting to PokerStars")
+            print(_("No sites selected - defaulting to PokerStars"))
             sitenos = [2]
         if not games:
-            print _("No games found")
+            print(_("No games found"))
             return
         if not currencies:
-            print _("No currencies found")
+            print(_("No currencies found"))
             return
         if not playerids:
-            print _("No player ids found")
+            print(_("No player ids found"))
             return
         if not limits:
-            print _("No limits found")
+            print(_("No limits found"))
             return
 
         self.createStatsPane(frame, playerids, sitenos, games, currencies, limits, seats)
@@ -201,17 +201,17 @@ class GuiSessionViewer(QSplitter):
 
         if DEBUG:
             for x in quotes:
-                print "start %s\tend %s  \thigh %s\tlow %s" % (x[1], x[2], x[3], x[4])
+                print("start %s\tend %s  \thigh %s\tlow %s" % (x[1], x[2], x[3], x[4]))
 
         self.generateGraph(quotes)
 
         self.addTable(frame, results)
 
         self.db.rollback()
-        print _("Stats page displayed in %4.2f seconds") % (time() - starttime)
+        print(_("Stats page displayed in %4.2f seconds") % (time() - starttime))
 
     def generateDatasets(self, playerids, sitenos, games, currencies, limits, seats):
-        if (DEBUG): print "DEBUG: Starting generateDatasets"
+        if (DEBUG): print("DEBUG: Starting generateDatasets")
         THRESHOLD = 1800     # Min # of secs between consecutive hands before being considered a new session
         PADDING   = 5        # Additional time in minutes to add to a session, session startup, shutdown etc
 
@@ -221,7 +221,7 @@ class GuiSessionViewer(QSplitter):
         start_date, end_date = self.filters.getDates()
         q = q.replace("<datestest>", " BETWEEN '" + start_date + "' AND '" + end_date + "'")
 
-        for m in self.filters.display.items():
+        for m in list(self.filters.display.items()):
             if m[0] == 'Games' and m[1]:
                 if len(games) > 0:
                     gametest = str(tuple(games))
@@ -258,22 +258,22 @@ class GuiSessionViewer(QSplitter):
 
         if DEBUG:
             hands = [ 
-                ( u'10000',  10), ( u'10000',  20), ( u'10000',  30),
-                ( u'20000', -10), ( u'20000', -20), ( u'20000', -30),
-                ( u'30000',  40),
-                ( u'40000',   0),
-                ( u'50000', -40),
-                ( u'60000',  10), ( u'60000',  30), ( u'60000', -20),
-                ( u'70000', -20), ( u'70000',  10), ( u'70000',  30),
-                ( u'80000', -10), ( u'80000', -30), ( u'80000',  20),
-                ( u'90000',  20), ( u'90000', -10), ( u'90000', -30),
-                (u'100000',  30), (u'100000', -50), (u'100000',  30),
-                (u'110000', -20), (u'110000',  50), (u'110000', -20),
-                (u'120000', -30), (u'120000',  50), (u'120000', -30),
-                (u'130000',  20), (u'130000', -50), (u'130000',  20),
-                (u'140000',  40), (u'140000', -40),
-                (u'150000', -40), (u'150000',  40),
-                (u'160000', -40), (u'160000',  80), (u'160000', -40),
+                ( '10000',  10), ( '10000',  20), ( '10000',  30),
+                ( '20000', -10), ( '20000', -20), ( '20000', -30),
+                ( '30000',  40),
+                ( '40000',   0),
+                ( '50000', -40),
+                ( '60000',  10), ( '60000',  30), ( '60000', -20),
+                ( '70000', -20), ( '70000',  10), ( '70000',  30),
+                ( '80000', -10), ( '80000', -30), ( '80000',  20),
+                ( '90000',  20), ( '90000', -10), ( '90000', -30),
+                ('100000',  30), ('100000', -50), ('100000',  30),
+                ('110000', -20), ('110000',  50), ('110000', -20),
+                ('120000', -30), ('120000',  50), ('120000', -30),
+                ('130000',  20), ('130000', -50), ('130000',  20),
+                ('140000',  40), ('140000', -40),
+                ('150000', -40), ('150000',  40),
+                ('160000', -40), ('160000',  80), ('160000', -40),
                 ]
         else:
             self.db.cursor.execute(q)
@@ -290,8 +290,8 @@ class GuiSessionViewer(QSplitter):
         hands.insert(0, (hands[0][0], 0))
 
         # Take that list and create an array of the time between hands
-        times = map(lambda x:long(x[0]), hands)
-        profits = map(lambda x:float(x[1]), hands)
+        times = [int(x[0]) for x in hands]
+        profits = [float(x[1]) for x in hands]
         #print "DEBUG: times   : %s" % times
         #print "DEBUG: profits: %s" % profits
         #print "DEBUG: len(times) %s" %(len(times))
@@ -369,7 +369,7 @@ class GuiSessionViewer(QSplitter):
                 first_idx = end_idx
                 sid = sid+1
             else:
-                print "hds <= 0"
+                print("hds <= 0")
         global_close = close
         global_etime = etime
         results.append([''] * 11)
@@ -404,7 +404,7 @@ class GuiSessionViewer(QSplitter):
             self.canvas.setParent(self)
         except:
             err = traceback.extract_tb(sys.exc_info()[2])[-1]
-            print _("Error:")+" "+err[2]+"("+str(err[1])+"): "+str(sys.exc_info()[1])
+            print(_("Error:")+" "+err[2]+"("+str(err[1])+"): "+str(sys.exc_info()[1]))
             raise
 
 
@@ -425,7 +425,7 @@ class GuiSessionViewer(QSplitter):
         self.canvas.draw()
 
     def addTable(self, frame, results):
-        colxalign,colheading = range(2)
+        colxalign,colheading = list(range(2))
 
         self.liststore = QStandardItemModel(0, len(self.columns))
         self.liststore.setHorizontalHeaderLabels([column[colheading] for column in self.columns])

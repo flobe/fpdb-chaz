@@ -49,7 +49,7 @@ class InterProcessLockBase:
         if source == None:
             source="Unknown"
         if self._has_lock:             # make sure 2nd acquire in same process fails
-            print _("lock already held by:"),self.heldBy
+            print(_("lock already held by:"),self.heldBy)
             return False
         while not self._has_lock:
             try:

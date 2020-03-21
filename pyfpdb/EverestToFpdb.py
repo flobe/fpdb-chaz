@@ -35,16 +35,16 @@ class Everest(HandHistoryConverter):
     copyGameHeader = True
 
     substitutions = {
-                        'LS' : u"\$|\xe2\x82\xac|\u20ac|",
-                       'TAB' : u"-\u2013'\s\da-zA-Z",
-                       'NUM' : u".,\d\s",
+                        'LS' : "\$|\xe2\x82\xac|\u20ac|",
+                       'TAB' : "-\u2013'\s\da-zA-Z",
+                       'NUM' : ".,\d\s",
                     }
 
     # Static regexes
-    re_Identify   = re.compile(u'<HAND\stime=\"\d+\"\sid=')
+    re_Identify   = re.compile('<HAND\stime=\"\d+\"\sid=')
     re_SplitHands = re.compile(r'</HAND>')
     re_TailSplitHands = re.compile(r'(</game>)')
-    re_GameInfo = re.compile(u"""<SESSION\stime="\d+"\s
+    re_GameInfo = re.compile("""<SESSION\stime="\d+"\s
                                     tableName="(?P<TABLE>[%(TAB)s]+)"\s
                                     id="(?P<ID>[\d\.]+)"\s
                                     type="(?P<TYPE>[a-zA-Z ]+)"\s
@@ -53,7 +53,7 @@ class Everest(HandHistoryConverter):
                                     game="(?P<GAME>hold\-em|omaha\-hi)"\s
                                     gametype="(?P<LIMIT>[-a-zA-Z ]+)"/>
                                 """ % substitutions, re.VERBOSE|re.MULTILINE)
-    re_HandInfo = re.compile(u"""time="(?P<DATETIME>[0-9]+)"\s
+    re_HandInfo = re.compile("""time="(?P<DATETIME>[0-9]+)"\s
                                  id="(?P<HID>[0-9]+)"\s
                                  index="\d+?"\s
                                  blinds="([%(LS)s]?(?P<SB>[%(NUM)s]+)\s?[%(LS)s]?/[%(LS)s]?(?P<BB>[%(NUM)s]+)\s?[%(LS)s]?)"
@@ -145,9 +145,9 @@ class Everest(HandHistoryConverter):
             self.info['type'] = 'tour'
             self.info['tourNo'] = mg['ID']
             
-        if mg['CURRENCY'] == u'$':
+        if mg['CURRENCY'] == '$':
             self.info['currency'] = 'USD'   
-        elif mg['CURRENCY'] == u'\u20ac':
+        elif mg['CURRENCY'] == '\u20ac':
             self.info['currency'] = 'EUR'
         elif not mg['CURRENCY']:
             self.info['currency'] = 'play'

@@ -176,7 +176,7 @@ class GuiTourneyPlayerStats(QSplitter):
         numTourneys = self.filters.getNumTourneys()
         self.addGrid(vbox, 'tourneyPlayerDetailedStats', numTourneys, tourneyTypes, playerids, sitenos, seats)
 
-        print _("Stats page displayed in %4.2f seconds") % (time() - startTime)
+        print(_("Stats page displayed in %4.2f seconds") % (time() - startTime))
 
     def fillStatsFrame(self, vbox):
         tourneyTypes = self.filters.getTourneyTypes()
@@ -199,10 +199,10 @@ class GuiTourneyPlayerStats(QSplitter):
 
         if not sitenos:
             #Should probably pop up here.
-            print _("No sites selected - defaulting to PokerStars")
+            print(_("No sites selected - defaulting to PokerStars"))
             sitenos = [2]
         if not playerids:
-            print _("No player ids found")
+            print(_("No player ids found"))
             return
         
         self.createStatsTable(vbox, tourneyTypes, playerids, sitenos, seats)
@@ -228,7 +228,7 @@ class GuiTourneyPlayerStats(QSplitter):
 
         sitetest = ""
         q = []
-        for m in self.filters.display.items():
+        for m in list(self.filters.display.items()):
             if m[0] == 'Sites' and m[1]:
                 for n in sitenos:
                     q.append(n)
@@ -310,7 +310,7 @@ class GuiTourneyPlayerStats(QSplitter):
             col.set_sort_order(gtk.SORT_ASCENDING)
         self.liststore[grid].set_sort_column_id(n, col.get_sort_order())
         self.liststore[grid].set_sort_func(n, self.sortnums, (n,grid))
-        for i in xrange(len(self.listcols[grid])):
+        for i in range(len(self.listcols[grid])):
             self.listcols[grid][i].set_sort_indicator(False)
         self.listcols[grid][n].set_sort_indicator(True)
         # use this   listcols[col].set_sort_indicator(True)

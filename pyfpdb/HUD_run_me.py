@@ -17,7 +17,7 @@
 
 import sys
 import os
-import thread
+import _thread
 import time
 import string
 import re
@@ -54,7 +54,7 @@ if __name__== "__main__":
 
     gobject.threads_init()                # this is required
     hud = HUD_main.HUD_main()
-    thread.start_new_thread(hud.read_stdin, ()) # starts the thread
+    _thread.start_new_thread(hud.read_stdin, ()) # starts the thread
 
     HUD_main.main_window = gtk.Window()
     HUD_main.main_window.connect("destroy", destroy)

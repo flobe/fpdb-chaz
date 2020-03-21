@@ -25,7 +25,7 @@ def checkGameInfo(hhc, header, info):
 def testGameInfo():
     hhc = EverleafToFpdb.Everleaf(autostart=False)    
     pairs = (
-    (u"""Everleaf Gaming Game #3732225
+    ("""Everleaf Gaming Game #3732225
 ***** Hand history for game #3732225 *****
 Blinds  €0.50/ €1 NL Hold'em - 2009/01/11 - 16:09:40
 Table Casino Lyon Vert 58

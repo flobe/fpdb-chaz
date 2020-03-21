@@ -57,7 +57,7 @@ class Microgaming(HandHistoryConverter):
                                     (tablesize="(?P<MAX>\d+)"\s)?
                                     """, re.MULTILINE| re.VERBOSE)
     
-    re_Identify   = re.compile(u'<Game\s(hhversion="\d"\s)?id=\"\d+\"\sdate=\"[\d\-\s:]+\"\sunicodetablename')
+    re_Identify   = re.compile('<Game\s(hhversion="\d"\s)?id=\"\d+\"\sdate=\"[\d\-\s:]+\"\sunicodetablename')
     re_SplitHands = re.compile('\n*----.+.DAT----\n*')
     re_PlayerInfo = re.compile('<Seat num="(?P<SEAT>[0-9]+)" alias="(?P<PNAME>.+)" unicodealias=".+" balance="(?P<CASH>[.0-9]+)" endbalance="[.0-9]+"(?P<BUTTON>\sdealer="true")?', re.MULTILINE)
     re_Card       = re.compile('<Card value="[0-9JQKA]+" suit="[csdh]" id="(?P<CARD>\d+)"\s?/>', re.MULTILINE)
@@ -252,7 +252,7 @@ class Microgaming(HandHistoryConverter):
 #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
 #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 newcards = []
                 for found in m:
@@ -361,7 +361,7 @@ class Microgaming(HandHistoryConverter):
                 else:
                     hand.addBet(street, pname, action.group('BET'))
             elif action.group('ATYPE') == 'AllIn':
-                amount = action.group('BET').replace(u',', u'')
+                amount = action.group('BET').replace(',', '')
                 if (Decimal(amount) <= (hand.lastBet[street] - sum(hand.bets[street][pname]))):
                     hand.setUncalledBets(False)
                 hand.addAllIn(street, pname, action.group('BET'))

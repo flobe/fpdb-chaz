@@ -136,10 +136,10 @@ for a in re_space.finditer(razzlist):
     count+=1
     if count%10 == 0:
         string = string + "\n"
-print "-------------------------"
-print "Razz encode list"
-print "------------------------ "
-print string
+print("-------------------------")
+print("Razz encode list")
+print("------------------------ ")
+print(string)
 
 string = ""
 count = 1
@@ -151,8 +151,8 @@ for a in re_space.finditer(razzlist):
         string = string + "\n"
 
 
-print "-------------------------"
-print "Razz decode list"
-print "------------------------ "
-print string
+print("-------------------------")
+print("Razz decode list")
+print("------------------------ ")
+print(string)
 

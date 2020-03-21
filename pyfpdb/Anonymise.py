@@ -51,13 +51,13 @@ for kodec in ("utf8", "cp1252", "utf-16"):
         in_fh.close()
         break
     else:
-        print(_("Could not find file %s") % options.filename)
+        print((_("Could not find file %s") % options.filename))
         exit(1)
 
 m = hhc.re_PlayerInfo.finditer(filecontents)
 
 outfile = options.filename+".anon"
-print(_("Output being written to %s") % outfile)
+print((_("Output being written to %s") % outfile))
 
 savestdout = sys.stdout
 fsock = open(outfile,"w")
@@ -72,7 +72,7 @@ uniq = set(players)
 for i, name in enumerate(uniq):
     filecontents = filecontents.replace(name, 'Player%d' %i)
 
-print(filecontents.encode('utf-8'))
+print((filecontents.encode('utf-8')))
 
 sys.stdout = savestdout
 fsock.close()

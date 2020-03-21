@@ -35,8 +35,8 @@ class Fulltilt(HandHistoryConverter):
 
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",       # legal ISO currency codes
-                            'LS' : u"\$|\u20AC|\xe2\x82\xac|",  # legal currency symbols - Euro(cp1252, utf-8)
-                           'NUM' : u".,\dKMB",                     # legal characters in number format
+                            'LS' : "\$|\u20AC|\xe2\x82\xac|",  # legal currency symbols - Euro(cp1252, utf-8)
+                           'NUM' : ".,\dKMB",                     # legal characters in number format
                     }
 
     Lim_Blinds = {  '0.04': ('0.01', '0.02'),    '0.10': ('0.02', '0.05'),     '0.20': ('0.05', '0.10'),
@@ -110,7 +110,7 @@ class Fulltilt(HandHistoryConverter):
                     'Swiftly Tilting', 'Rapido', 'Veyron', )
 
     # Static regexes
-    re_GameInfo     = re.compile(u'''\#(?P<HID>[0-9]+):\s
+    re_GameInfo     = re.compile('''\#(?P<HID>[0-9]+):\s
                                     (?:(?P<TOURNAMENT>.+)\s\((?P<TOURNO>\d+)\),\s)?
                                     .+?
                                     \s-\s(?P<STAKES1>(?P<CURRENCY1>[%(LS)s]|)?(?P<SB1>[%(NUM)s]+)/[%(LS)s]?(?P<BB1>[%(NUM)s]+)\s(Ante\s\$?(?P<ANTE1>[%(NUM)s]+)\s)?-\s)?
@@ -119,10 +119,10 @@ class Fulltilt(HandHistoryConverter):
                                     (?P<GAME>(Hold\'em|((5|6)\sCard\s)?Omaha(\sH/L|\sHi/Lo|\sHi|)|Irish|Courchevel\sHi|5(-|\s)Card\sStud(\sHi)?|7\sCard\sStud|7\sCard\sStud|Stud\sH/L|Razz|Stud\sHi|2-7\sTriple\sDraw|5\sCard\sDraw|Badugi|2-7\sSingle\sDraw|A-5\sTriple\sDraw))\s
                                     (?P<STAKES2>-\s(?P<CURRENCY2>[%(LS)s]|)?(?P<SB2>[%(NUM)s]+)/[%(LS)s]?(?P<BB2>[%(NUM)s]+)\s(Ante\s\$?(?P<ANTE2>[%(NUM)s]+)\s)?)?-\s
                                  ''' % substitutions, re.VERBOSE)
-    re_Identify     = re.compile(u'FullTiltPoker|Full\sTilt\sPoker\sGame\s#\d+:')
+    re_Identify     = re.compile('FullTiltPoker|Full\sTilt\sPoker\sGame\s#\d+:')
     re_SplitHands   = re.compile(r"\n\n\n+")
     re_TailSplitHands   = re.compile(r"(\n\n+)")
-    re_HandInfo     = re.compile(u'''\#(?P<HID>[0-9]+):\s
+    re_HandInfo     = re.compile('''\#(?P<HID>[0-9]+):\s
                                     (?:(?P<TOURNAMENT>.+?)\s(\((?P<TOURPAREN>.+)\)\s+)?\((?P<TOURNO>\d+)\),\s)?
                                     ((Table|Match)\s)?
                                     ((?P<PLAY>Play\sChip\s|PC)?
@@ -260,7 +260,7 @@ class Fulltilt(HandHistoryConverter):
                        'OE' : 'oe',
                        'SE' : 'se'
             }
-        currencies = { u'€':'EUR', '$':'USD', '':'T$' }
+        currencies = { '€':'EUR', '$':'USD', '':'T$' }
         
         if mg['STAKES1'] is not None:
             stakesId = '1'
@@ -416,7 +416,7 @@ class Fulltilt(HandHistoryConverter):
             if (n.group('BUYINGUAR') is not None and n.group('FEE') is not None):
                 if n.group('CURRENCY')=="$":
                     hand.buyinCurrency="USD"
-                elif n.group('CURRENCY')==u"€":
+                elif n.group('CURRENCY')=="€":
                     hand.buyinCurrency="EUR"
                 hand.buyin = int(100*Decimal(self.clearMoneyString(n.group('BUYINGUAR'))))
                 hand.fee = int(100*Decimal(self.clearMoneyString(n.group('FEE'))))
@@ -431,7 +431,7 @@ class Fulltilt(HandHistoryConverter):
             elif (n.group('BUYINGUAR') is not None and hand.isSng):
                 if n.group('CURRENCY')=="$":
                     hand.buyinCurrency="USD"
-                elif n.group('CURRENCY')==u"€":
+                elif n.group('CURRENCY')=="€":
                     hand.buyinCurrency="EUR"
                 buyinfee = int(100*Decimal(self.clearMoneyString(n.group('BUYINGUAR'))))
                 if hand.maxseats==2 and buyinfee in self.HUSnG_Fee and self.HUSnG_Fee[buyinfee].get(hand.speed) is not None:
@@ -581,7 +581,7 @@ class Fulltilt(HandHistoryConverter):
     def readButton(self, hand):
         try:
             hand.buttonpos = int(self.re_Button.search(hand.handText).group('BUTTON'))
-        except AttributeError, e:
+        except AttributeError as e:
             # FTP has no indication that a hand is cancelled.
             raise FpdbHandPartial(_("%s Failed to detect button (hand #%s cancelled?)") % ("readButton:", hand.handid))
 
@@ -589,7 +589,7 @@ class Fulltilt(HandHistoryConverter):
 #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
 #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
 #                    if m == None:
@@ -599,7 +599,7 @@ class Fulltilt(HandHistoryConverter):
                     newcards = found.group('NEWCARDS').split(' ')
                     hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
 
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             for found in m:
@@ -657,14 +657,14 @@ class Fulltilt(HandHistoryConverter):
     def readCollectPot(self,hand):
         awardFound = False
         for m in self.re_CollectPot.finditer(hand.handText):
-            hand.addCollectPot(player=m.group('PNAME'),pot=re.sub(u',',u'',m.group('POT')))
+            hand.addCollectPot(player=m.group('PNAME'),pot=re.sub(',','',m.group('POT')))
             awardFound = True
         for m in self.re_CollectSidePot.finditer(hand.handText):
-            hand.addCollectPot(player=m.group('PNAME'),pot=re.sub(u',',u'',m.group('POT')))
+            hand.addCollectPot(player=m.group('PNAME'),pot=re.sub(',','',m.group('POT')))
             awardFound = True
         if not awardFound:
             for m in self.re_CollectPot2.finditer(hand.handText):
-                 hand.addCollectPot(player=m.group('PNAME'),pot=re.sub(u',',u'',m.group('POT')))
+                 hand.addCollectPot(player=m.group('PNAME'),pot=re.sub(',','',m.group('POT')))
 
     def readShownCards(self,hand):
         for m in self.re_ShownCards.finditer(hand.handText):

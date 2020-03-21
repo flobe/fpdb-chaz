@@ -20,11 +20,11 @@ from PyQt5.QtGui import (QPixmap, QPainter)
 from PyQt5.QtSvg import QSvgRenderer
 
 class Deck(object):
-    def __init__(self, config, deck_type=u'colour', card_back=u'back04', width=30, height=42):
+    def __init__(self, config, deck_type='colour', card_back='back04', width=30, height=42):
         self.__width = width
         self.__height = height
-        self.__cardspath = os.path.join(config.graphics_path, u"cards", deck_type)
-        self.__backfile = os.path.join(config.graphics_path, u"cards", u"backs", (card_back + u".svg"))
+        self.__cardspath = os.path.join(config.graphics_path, "cards", deck_type)
+        self.__backfile = os.path.join(config.graphics_path, "cards", "backs", (card_back + ".svg"))
         self.__cards = dict({ 's': None, 'h': None, 'd': None, 'c': None })
         self.__card_back = None
         self.__rank_vals = dict()

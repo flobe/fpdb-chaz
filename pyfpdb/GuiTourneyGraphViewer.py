@@ -36,16 +36,16 @@ try:
     if calluse:
         try:
             matplotlib.use('qt5agg')
-        except ValueError, e:
-            print e
+        except ValueError as e:
+            print(e)
     from matplotlib.figure import Figure
     from matplotlib.backends.backend_qt5agg import FigureCanvas
     from matplotlib.font_manager import FontProperties
     from numpy import arange, cumsum
-except ImportError, inst:
-    print _("""Failed to load libs for graphing, graphing will not function. Please install numpy and matplotlib if you want to use graphs.""")
-    print _("""This is of no consequence for other parts of the program, e.g. import and HUD are NOT affected by this problem.""")
-    print "ImportError: %s" % inst.args
+except ImportError as inst:
+    print(_("""Failed to load libs for graphing, graphing will not function. Please install numpy and matplotlib if you want to use graphs."""))
+    print(_("""This is of no consequence for other parts of the program, e.g. import and HUD are NOT affected by this problem."""))
+    print("ImportError: %s" % inst.args)
 
 class GuiTourneyGraphViewer(QSplitter):
 
@@ -135,12 +135,12 @@ class GuiTourneyGraphViewer(QSplitter):
 
         if not sitenos:
             #Should probably pop up here.
-            print _("No sites selected - defaulting to PokerStars")
+            print(_("No sites selected - defaulting to PokerStars"))
             self.db.rollback()
             return
 
         if not playerids:
-            print _("No player ids found")
+            print(_("No player ids found"))
             self.db.rollback()
             return
 
@@ -150,7 +150,7 @@ class GuiTourneyGraphViewer(QSplitter):
         #Get graph data from DB
         starttime = time()
         green = self.getData(playerids, sitenos)
-        print _("Graph generated in: %s") %(time() - starttime)
+        print(_("Graph generated in: %s") %(time() - starttime))
 
 
         #Set axis labels and grid overlay properites
@@ -220,7 +220,7 @@ class GuiTourneyGraphViewer(QSplitter):
         if len(winnings) == 0:
             return None
 
-        green = map(lambda x:float(x[1]), winnings)
+        green = [float(x[1]) for x in winnings]
         #blue  = map(lambda x: float(x[1]) if x[2] == True  else 0.0, winnings)
         #red   = map(lambda x: float(x[1]) if x[2] == False else 0.0, winnings)
         greenline = cumsum(green)
@@ -244,8 +244,8 @@ class GuiTourneyGraphViewer(QSplitter):
 
         response = dia_chooser.run()
         
-        if response <> gtk.RESPONSE_OK:
-            print _('Closed, no graph exported')
+        if response != gtk.RESPONSE_OK:
+            print(_('Closed, no graph exported'))
             dia_chooser.destroy()
             return
             

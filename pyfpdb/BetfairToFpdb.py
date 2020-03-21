@@ -35,12 +35,12 @@ class Betfair(HandHistoryConverter):
 
     # Static regexes
     re_GameInfo      = re.compile("^(?P<LIMIT>NL|PL|) (?P<CURRENCY>\$|)?(?P<SB>[.0-9]+)/\$?(?P<BB>[.0-9]+) (?P<GAME>(Texas Hold\'em|Omaha Hi|Omaha|Razz))", re.MULTILINE)
-    re_Identify      = re.compile(u'\*{5}\sBetfair\sPoker\sHand\sHistory\sfor\sGame\s\d+\s')
+    re_Identify      = re.compile('\*{5}\sBetfair\sPoker\sHand\sHistory\sfor\sGame\s\d+\s')
     re_SplitHands    = re.compile(r'\n\n+')
     re_HandInfo      = re.compile("\*\*\*\*\* Betfair Poker Hand History for Game (?P<HID>[0-9]+) \*\*\*\*\*\n(?P<LIMIT>NL|PL|) (?P<CURRENCY>\$|)?(?P<SB>[.0-9]+)/\$?(?P<BB>[.0-9]+) (?P<GAMETYPE>(Texas Hold\'em|Omaha|Razz)) - (?P<DATETIME>[a-zA-Z]+, [a-zA-Z]+ \d+, \d\d:\d\d:\d\d GMT \d\d\d\d)\nTable (?P<TABLE>[ a-zA-Z0-9]+) \d-max \(Real Money\)\nSeat (?P<BUTTON>[0-9]+)", re.MULTILINE)
-    re_Button        = re.compile(ur"^Seat (?P<BUTTON>\d+) is the button", re.MULTILINE)
+    re_Button        = re.compile(r"^Seat (?P<BUTTON>\d+) is the button", re.MULTILINE)
     re_PlayerInfo    = re.compile("Seat (?P<SEAT>[0-9]+): (?P<PNAME>.*)\s\(\s(\$(?P<CASH>[.0-9]+)) \)")
-    re_Board         = re.compile(ur"\[ (?P<CARDS>.+) \]")
+    re_Board         = re.compile(r"\[ (?P<CARDS>.+) \]")
 
 
     def compilePlayerRegexs(self,  hand):
@@ -87,7 +87,7 @@ class Betfair(HandHistoryConverter):
                            'Razz' : ('stud','razz'),
                     '7 Card Stud' : ('stud','studhi')
                }
-        currencies = { u' €':'EUR', '$':'USD', '':'T$' }
+        currencies = { ' €':'EUR', '$':'USD', '':'T$' }
         if 'LIMIT' in mg:
             info['limitType'] = limits[mg['LIMIT']]
         if 'GAME' in mg:
@@ -169,7 +169,7 @@ class Betfair(HandHistoryConverter):
         #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
         #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
                     hand.hero = found.group('PNAME')

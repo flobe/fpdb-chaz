@@ -112,7 +112,7 @@ class Merge(HandHistoryConverter):
 
 
     # Static regexes
-    re_Identify = re.compile(u'<game\sid=\"[0-9]+\-[0-9]+\"\sstarttime')
+    re_Identify = re.compile('<game\sid=\"[0-9]+\-[0-9]+\"\sstarttime')
     re_SplitHands = re.compile(r'</game>\n+(?=<)')
     re_TailSplitHands = re.compile(r'(</game>)')
     re_GameInfo = re.compile(r'<description type="(?P<GAME>Holdem|Omaha|Omaha|Omaha\sH/L8|2\-7\sLowball|A\-5\sLowball|Badugi|5\-Draw\sw/Joker|5\-Draw|7\-Stud|7\-Stud\sH/L8|5\-Stud|Razz|HORSE|RASH|HA|HO|SHOE|HOSE|HAR)(?P<TYPE>\sTournament)?" stakes="(?P<LIMIT>(No Limit|Limit|Pot Limit|Half Pot Limit)\s?)(\sLevel\s\d+\sBlinds)?(\s\(?\$?(?P<SB>[.0-9]+)?/?\$?(?P<BB>[.0-9]+)?(?P<blah>.*)\)?)?"(\sversion="\d+")?\s?/>\s?', re.MULTILINE)
@@ -340,15 +340,15 @@ or None if we fail to get the info """
             fulltable = False
             for action in m2:
                 acted[action.group('PSEAT')] = True
-                if acted.keys() == seated.keys(): # We've faound all players
+                if list(acted.keys()) == list(seated.keys()): # We've faound all players
                     fulltable = True
                     break
             if fulltable != True:
-                for seatno in seated.keys():
+                for seatno in list(seated.keys()):
                     if seatno not in acted:
                         del seated[seatno]
 
-                for seatno in acted.keys():
+                for seatno in list(acted.keys()):
                     if seatno not in seated:
                         log.error(_("MergeToFpdb.readPlayerStacks: '%s' Seat:%s acts but not listed") % (hand.handid, seatno))
                         raise FpdbParseError
@@ -516,7 +516,7 @@ or None if we fail to get the info """
                     hand.gametype['sb'] = str(int(Decimal(hand.gametype['bb']))/2)
             hand.sb = hand.gametype['sb']
             hand.bb = hand.gametype['bb']
-            for player, blindtype in allinBlinds.iteritems():
+            for player, blindtype in allinBlinds.items():
                 if blindtype=='big blind':
                     self.adjustMergeTourneyStack(hand, player, hand.bb)
                     hand.addBlind(player, 'big blind', hand.bb)
@@ -557,7 +557,7 @@ or None if we fail to get the info """
 #    we need to grab hero's cards
         herocards = []
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
 #                    if m == None:
@@ -568,7 +568,7 @@ or None if we fail to get the info """
                     hand.addHoleCards(street, hand.hero, closed=cards, shown=False, mucked=False, dealt=True)
 
         for street in hand.holeStreets:
-            if hand.streets.has_key(street):
+            if street in hand.streets:
                 if not hand.streets[street] or street in ('PREFLOP', 'DEAL') or hand.gametype['base'] == 'hold': continue  # already done these
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:

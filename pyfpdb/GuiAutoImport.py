@@ -142,9 +142,9 @@ class GuiAutoImport(QWidget):
 
     def reset_startbutton(self):
         if self.pipe_to_hud is not None:
-            self.startButton.set_label(_(u'Stop Auto Import'))
+            self.startButton.set_label(_('Stop Auto Import'))
         else:
-            self.startButton.set_label(_(u'Start Auto Import'))
+            self.startButton.set_label(_('Start Auto Import'))
 
         return False
 
@@ -154,7 +154,7 @@ class GuiAutoImport(QWidget):
         for site in the_sites:
             params = self.config.get_site_parameters(site)
             if params['enabled'] == True:
-                print (_("DEBUG:") + " " + _("Detecting hand history directory for site: '%s'") % site)
+                print((_("DEBUG:") + " " + _("Detecting hand history directory for site: '%s'") % site))
                 if os.name == 'posix':
                     if self.posix_detect_hh_dirs(site):
                         #data[1].set_text(dia_chooser.get_filename())
@@ -171,7 +171,7 @@ class GuiAutoImport(QWidget):
         if site == 'PokerStars':
             directory = os.path.expanduser(defaults[site])
             for file in [file for file in os.listdir(directory) if not file in [".",".."]]:
-                print file
+                print(file)
         return False
 
     def startClicked(self):
@@ -218,7 +218,7 @@ class GuiAutoImport(QWidget):
                         command = [command, ] + string.split(self.settings['cl_options'])
                         bs = 1
 
-                        print _("opening pipe to HUD")
+                        print(_("opening pipe to HUD"))
                     try:
                         if self.config.install_method == "exe" or (os.name == "nt" and win32console.GetConsoleWindow() == 0):
                             self.pipe_to_hud = subprocess.Popen(command, bufsize=bs,

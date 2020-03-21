@@ -26,7 +26,7 @@ Handles fpdb/fpdb-hud configuration files.
 #TODO fix / rethink edit stats - it is broken badly just now
 
 #    Standard Library modules
-from __future__ import with_statement
+
 
 import L10n
 _ = L10n.get_translation()
@@ -50,7 +50,7 @@ else:
     winpaths_appdata = False
 
 import logging, logging.config
-import ConfigParser
+import configparser
 
 # config version is used to flag a warning at runtime if the users config is
 #  out of date.
@@ -82,12 +82,12 @@ else:
     INSTALL_METHOD = "source"
 
 if INSTALL_METHOD == "exe" or INSTALL_METHOD == "app":
-    FPDB_ROOT_PATH = os.path.dirname(unicode(sys.executable, sys.getfilesystemencoding())) # should be exe path to \fpdbroot\pyfpdb
+    FPDB_ROOT_PATH = os.path.dirname(str(sys.executable, sys.getfilesystemencoding())) # should be exe path to \fpdbroot\pyfpdb
 elif sys.path[0] == "": # we are probably running directly (>>>import Configuration)
-    temp = os.getcwdu() # should be ./pyfpdb
+    temp = os.getcwd() # should be ./pyfpdb
     FPDB_ROOT_PATH = os.path.join(temp, os.pardir)   # go up one level (to fpdbroot)
 else: # all other cases
-    FPDB_ROOT_PATH = os.path.dirname(unicode(sys.path[0], sys.getfilesystemencoding()))  # should be source path to /fpdbroot
+    FPDB_ROOT_PATH = os.path.dirname(str(sys.path[0], sys.getfilesystemencoding()))  # should be source path to /fpdbroot
 
 sysPlatform = platform.system()  #Linux, Windows, Darwin
 if sysPlatform[0:5] == 'Linux':
@@ -95,25 +95,25 @@ if sysPlatform[0:5] == 'Linux':
 elif sysPlatform == 'Darwin':
     OS_FAMILY = 'Mac'
 elif sysPlatform == 'Windows':
-    if platform.release() <> 'XP':
+    if platform.release() != 'XP':
         OS_FAMILY = 'Win7' #Vista and win7
     else:
         OS_FAMILY = 'XP'
 else:
     OS_FAMILY = False
 
-GRAPHICS_PATH = os.path.join(FPDB_ROOT_PATH, u"gfx")
-PYFPDB_PATH = os.path.join(FPDB_ROOT_PATH, u"pyfpdb")
+GRAPHICS_PATH = os.path.join(FPDB_ROOT_PATH, "gfx")
+PYFPDB_PATH = os.path.join(FPDB_ROOT_PATH, "pyfpdb")
 
 if OS_FAMILY in ['XP', 'Win7']:
     APPDATA_PATH = winpaths_appdata
-    CONFIG_PATH = os.path.join(APPDATA_PATH, u"fpdb")
+    CONFIG_PATH = os.path.join(APPDATA_PATH, "fpdb")
 elif OS_FAMILY == 'Mac':
     APPDATA_PATH = os.getenv("HOME")
-    CONFIG_PATH = os.path.join(APPDATA_PATH, u".fpdb")
+    CONFIG_PATH = os.path.join(APPDATA_PATH, ".fpdb")
 elif OS_FAMILY == 'Linux':
-    APPDATA_PATH = os.path.expanduser(u"~")
-    CONFIG_PATH = os.path.join(APPDATA_PATH, u".fpdb")
+    APPDATA_PATH = os.path.expanduser("~")
+    CONFIG_PATH = os.path.join(APPDATA_PATH, ".fpdb")
 else:
     APPDATA_PATH = False
     CONFIG_PATH = False
@@ -196,7 +196,7 @@ def get_config(file_name, fallback = True):
                      + " " + _("Config file has been created at %r.") % (config_path+"\n") )
 
         except:
-            print(_("Error copying .example config file, cannot fall back. Exiting."), "\n")
+            print((_("Error copying .example config file, cannot fall back. Exiting."), "\n"))
             sys.stderr.write(_("Error copying .example config file, cannot fall back. Exiting.")+"\n")
             sys.stderr.write( str(sys.exc_info()) )
             sys.exit()
@@ -208,9 +208,9 @@ def get_config(file_name, fallback = True):
     return (config_path,example_copy,example_path)
 
 def set_logfile(file_name):
-    (conf_file,copied,example_file) = get_config(u"logging.conf", fallback = False)
+    (conf_file,copied,example_file) = get_config("logging.conf", fallback = False)
 
-    log_dir = os.path.join(CONFIG_PATH, u'log')
+    log_dir = os.path.join(CONFIG_PATH, 'log')
     check_dir(log_dir)
     log_file = os.path.join(log_dir, file_name)
 
@@ -261,7 +261,7 @@ LOCALE_ENCODING = locale.getpreferredencoding()
 if LOCALE_ENCODING in ("US-ASCII", "", None):
     LOCALE_ENCODING = "cp1252"
     if (os.uname()[0]!="Darwin"):
-        print(_("Default encoding set to US-ASCII, defaulting to CP1252 instead."), _("Please report this problem."))
+        print((_("Default encoding set to US-ASCII, defaulting to CP1252 instead."), _("Please report this problem.")))
     
 # needs LOCALE_ENCODING (above), imported for sqlite setup in Config class below
 import Charset
@@ -290,12 +290,12 @@ class Layout:
 
         self.location = []
         self.hh_seats = []
-        self.location = map(lambda x: None, range(self.max+1)) # fill array with max seats+1 empty entries
+        self.location = [None for x in range(self.max+1)] # fill array with max seats+1 empty entries
         # hh_seats is used to map the seat numbers specified in hand history files (and stored in db) onto 
         #   the contiguous integerss, 1 to self.max, used to index hud stat_windows (and aw seat_windows) for display
         #   For most sites these numbers are the same, but some sites (e.g. iPoker) omit seat numbers in hand histories
         #   for tables smaller than 10-max.   
-        self.hh_seats= map(lambda x: None, range(self.max+1)) # fill array with max seats+1 empty entries
+        self.hh_seats= [None for x in range(self.max+1)] # fill array with max seats+1 empty entries
 
         for location_node in node.getElementsByTagName('location'):
             hud_seat = location_node.getAttribute('seat')
@@ -451,7 +451,7 @@ class Stat_sets:
         temp = temp + "    xpad = %d" % self.xpad
         temp = temp + " ypad = %d\n" % self.ypad
 
-        for stat in self.stats.keys():
+        for stat in list(self.stats.keys()):
             temp = temp + "%s" % self.stats[stat]
 
         return temp
@@ -481,7 +481,7 @@ class Database:
 
 class Aux_window:
     def __init__(self, node):
-        for (name, value) in node.attributes.items():
+        for (name, value) in list(node.attributes.items()):
             setattr(self, name, value)
 
     def __str__(self):
@@ -497,7 +497,7 @@ class Aux_window:
 
 class Supported_games:
     def __init__(self, node):
-        for (name, value) in node.attributes.items():
+        for (name, value) in list(node.attributes.items()):
             setattr(self, name, value)
 
         self.game_stat_set = {}
@@ -522,7 +522,7 @@ class Supported_games:
 
 class Layout_set:
     def __init__(self, node):
-        for (name, value) in node.attributes.items():
+        for (name, value) in list(node.attributes.items()):
             setattr(self, name, value)
 
         self.layout = {}
@@ -648,8 +648,8 @@ class General(dict):
         # day_start    - number n where 0.0 <= n < 24.0 representing start of day for user
         #                e.g. user could set to 4.0 for day to start at 4am local time
         # [ HH_bulk_path was here - now moved to import section ]
-        for (name, value) in node.attributes.items():
-            log.debug(unicode(_("config.general: adding %s = %s"), "utf8") % (name,value))
+        for (name, value) in list(node.attributes.items()):
+            log.debug(str(_("config.general: adding %s = %s"), "utf8") % (name,value))
             self[name] = value
         
         try:
@@ -696,7 +696,7 @@ class GUICashStats(list):
                 try:
                     if child.hasAttribute('xalignment'):   xalignment   = float(child.getAttribute('xalignment'))
                 except ValueError:
-                    print(_("bad number in xalignment was ignored"))
+                    print((_("bad number in xalignment was ignored")))
                     log.info(_("bad number in xalignment was ignored"))
 
                 self.append( [col_name, col_title, disp_all, disp_posn, field_format, field_type, xalignment] )
@@ -704,33 +704,33 @@ class GUICashStats(list):
     def get_defaults(self):
         """A list of defaults to be called, should there be no entry in config"""
         # SQL column name, display title, display all, display positional, format, type, alignment
-        defaults = [   [u'game', u'Game', True, True, u'%s', u'str', 0.0],       
-            [u'hand', u'Hand', False, False, u'%s', u'str', 0.0],
-            [u'plposition', u'Posn', False, False, u'%s', u'str', 1.0],
-            [u'pname', u'Name', False, False, u'%s', u'str', 0.0],
-            [u'n', u'Hds', True, True, u'%1.0f', u'str', 1.0],
-            [u'avgseats', u'Seats', False, False, u'%3.1f', u'str', 1.0],
-            [u'vpip', u'VPIP', True, True, u'%3.1f', u'str', 1.0],
-            [u'pfr', u'PFR', True, True, u'%3.1f', u'str', 1.0],
-            [u'pf3', u'PF3', True, True, u'%3.1f', u'str', 1.0],
-            [u'aggfac', u'AggFac', True, True, u'%2.2f', u'str', 1.0],
-            [u'aggfrq', u'AggFreq', True, True, u'%3.1f', u'str', 1.0],
-            [u'conbet', u'ContBet', True, True, u'%3.1f', u'str', 1.0],
-            [u'rfi', u'RFI', True, True, u'%3.1f', u'str', 1.0],
-            [u'steals', u'Steals', True, True, u'%3.1f', u'str', 1.0],
-            [u'saw_f', u'Saw_F', True, True, u'%3.1f', u'str', 1.0],
-            [u'sawsd', u'SawSD', True, True, u'%3.1f', u'str', 1.0],
-            [u'wtsdwsf', u'WtSDwsF', True, True, u'%3.1f', u'str', 1.0],
-            [u'wmsd', u'W$SD', True, True, u'%3.1f', u'str', 1.0],
-            [u'flafq', u'FlAFq', True, True, u'%3.1f', u'str', 1.0],
-            [u'tuafq', u'TuAFq', True, True, u'%3.1f', u'str', 1.0],
-            [u'rvafq', u'RvAFq', True, True, u'%3.1f', u'str', 1.0],
-            [u'pofafq', u'PoFAFq', False, False, u'%3.1f', u'str', 1.0],
-            [u'net', u'Net($)', True, True, u'%6.2f', u'cash', 1.0],
-            [u'bbper100', u'bb/100', True, True, u'%4.2f', u'str', 1.0],
-            [u'rake', u'Rake($)', True, True, u'%6.2f', u'cash', 1.0],
-            [u'bb100xr', u'bbxr/100', True, True, u'%4.2f', u'str', 1.0],
-            [u'stddev', u'Standard Deviation', True, True, u'%5.2f', u'str', 1.0]
+        defaults = [   ['game', 'Game', True, True, '%s', 'str', 0.0],       
+            ['hand', 'Hand', False, False, '%s', 'str', 0.0],
+            ['plposition', 'Posn', False, False, '%s', 'str', 1.0],
+            ['pname', 'Name', False, False, '%s', 'str', 0.0],
+            ['n', 'Hds', True, True, '%1.0f', 'str', 1.0],
+            ['avgseats', 'Seats', False, False, '%3.1f', 'str', 1.0],
+            ['vpip', 'VPIP', True, True, '%3.1f', 'str', 1.0],
+            ['pfr', 'PFR', True, True, '%3.1f', 'str', 1.0],
+            ['pf3', 'PF3', True, True, '%3.1f', 'str', 1.0],
+            ['aggfac', 'AggFac', True, True, '%2.2f', 'str', 1.0],
+            ['aggfrq', 'AggFreq', True, True, '%3.1f', 'str', 1.0],
+            ['conbet', 'ContBet', True, True, '%3.1f', 'str', 1.0],
+            ['rfi', 'RFI', True, True, '%3.1f', 'str', 1.0],
+            ['steals', 'Steals', True, True, '%3.1f', 'str', 1.0],
+            ['saw_f', 'Saw_F', True, True, '%3.1f', 'str', 1.0],
+            ['sawsd', 'SawSD', True, True, '%3.1f', 'str', 1.0],
+            ['wtsdwsf', 'WtSDwsF', True, True, '%3.1f', 'str', 1.0],
+            ['wmsd', 'W$SD', True, True, '%3.1f', 'str', 1.0],
+            ['flafq', 'FlAFq', True, True, '%3.1f', 'str', 1.0],
+            ['tuafq', 'TuAFq', True, True, '%3.1f', 'str', 1.0],
+            ['rvafq', 'RvAFq', True, True, '%3.1f', 'str', 1.0],
+            ['pofafq', 'PoFAFq', False, False, '%3.1f', 'str', 1.0],
+            ['net', 'Net($)', True, True, '%6.2f', 'cash', 1.0],
+            ['bbper100', 'bb/100', True, True, '%4.2f', 'str', 1.0],
+            ['rake', 'Rake($)', True, True, '%6.2f', 'cash', 1.0],
+            ['bb100xr', 'bbxr/100', True, True, '%4.2f', 'str', 1.0],
+            ['stddev', 'Standard Deviation', True, True, '%5.2f', 'str', 1.0]
             ]
         for col in defaults:
             self.append (col)
@@ -752,14 +752,14 @@ class RawHands:
             if save in ("none", "error", "all"):
                 self.save=save
             else:
-                print (_("Invalid config value for %s, defaulting to %s") % (raw_hands.save, "\"error\""))
+                print((_("Invalid config value for %s, defaulting to %s") % (raw_hands.save, "\"error\"")))
                 self.save="error"
             
             compression=node.getAttribute("compression")
             if save in ("none", "gzip", "bzip2"):
                 self.compression=compression
             else:
-                print (_("Invalid config value for %s, defaulting to %s") % (raw_hands.compression, "\"none\""))
+                print((_("Invalid config value for %s, defaulting to %s") % (raw_hands.compression, "\"none\"")))
                 self.compression="none"
     #end def __init__
 
@@ -778,14 +778,14 @@ class RawTourneys:
             if save in ("none", "error", "all"):
                 self.save=save
             else:
-                print (_("Invalid config value for %s, defaulting to %s") % (raw_tourneys.save, "\"error\""))
+                print((_("Invalid config value for %s, defaulting to %s") % (raw_tourneys.save, "\"error\"")))
                 self.save="error"
             
             compression=node.getAttribute("compression")
             if save in ("none", "gzip", "bzip2"):
                 self.compression=compression
             else:
-                print (_("Invalid config value for %s, defaulting to %s") % (raw_tourneys.compression, "\"none\""))
+                print((_("Invalid config value for %s, defaulting to %s") % (raw_tourneys.compression, "\"none\"")))
                 self.compression="none"
     #end def __init__
 
@@ -810,11 +810,11 @@ class Config:
             os.mkdir(CONFIG_PATH)
 
         if custom_log_dir and os.path.exists(custom_log_dir):
-            self.dir_log = unicode(custom_log_dir, "utf8")
+            self.dir_log = str(custom_log_dir, "utf8")
         else:
-            self.dir_log = os.path.join(CONFIG_PATH, u'log')
-        self.log_file = os.path.join(self.dir_log, u'fpdb-log.txt')
-        self.dir_database = os.path.join(CONFIG_PATH, u'database')
+            self.dir_log = os.path.join(CONFIG_PATH, 'log')
+        self.log_file = os.path.join(self.dir_log, 'fpdb-log.txt')
+        self.dir_database = os.path.join(CONFIG_PATH, 'database')
         log = logging.getLogger("config")
 
 #    "file" is a path to an xml file with the fpdb/HUD configuration
@@ -825,12 +825,12 @@ class Config:
         if file is not None: # config file path passed in
             file = os.path.expanduser(file)
             if not os.path.exists(file):
-                print(_("Configuration file %s not found. Using defaults.") % (file))
+                print((_("Configuration file %s not found. Using defaults.") % (file)))
                 sys.stderr.write(_("Configuration file %s not found. Using defaults.") % (file))
                 file = None
 
         self.example_copy,example_file = True,None
-        if file is None: (file,self.example_copy,example_file) = get_config(u"HUD_config.xml", True)
+        if file is None: (file,self.example_copy,example_file) = get_config("HUD_config.xml", True)
 
         self.file = file
                     
@@ -852,7 +852,7 @@ class Config:
         added,n = 1,0  # use n to prevent infinite loop if add_missing_elements() fails somehow
         while added > 0 and n < 2:
             n = n + 1
-            log.info(unicode(_("Reading configuration file %s"), "utf8") % file)
+            log.info(str(_("Reading configuration file %s"), "utf8") % file)
             #print (("\n"+_("Reading configuration file %s")+"\n") % file)
             try:
                 doc = xml.dom.minidom.parse(file)
@@ -961,7 +961,7 @@ class Config:
                 self.set_db_parameters(db_name = 'fpdb', db_ip = df_parms['db-host'],
                                      db_user = df_parms['db-user'],
                                      db_pass = df_parms['db-password'])
-                self.save(file=os.path.join(CONFIG_PATH, u"HUD_config.xml"))
+                self.save(file=os.path.join(CONFIG_PATH, "HUD_config.xml"))
         
         if doc.getElementsByTagName("raw_hands") == []:
             self.raw_hands = RawHands()
@@ -1001,18 +1001,18 @@ class Config:
                             cnode.appendChild(new)
                             t_node = self.doc.createTextNode("\r\n\r\n")
                             cnode.appendChild(t_node)
-                            print("... adding missing config section: " + e.localName)
+                            print(("... adding missing config section: " + e.localName))
                             nodes_added = nodes_added + 1
 
         if nodes_added > 0:
-            print(("Added %d missing config sections" % nodes_added)+"\n")
+            print((("Added %d missing config sections" % nodes_added)+"\n"))
             self.save()
 
         return nodes_added
 
     def find_default_conf(self):
         if CONFIG_PATH:
-            config_file = os.path.join(CONFIG_PATH, u'default.conf')
+            config_file = os.path.join(CONFIG_PATH, 'default.conf')
         else: config_file = False
 
         if config_file and os.path.exists(config_file):
@@ -1199,13 +1199,13 @@ class Config:
     def save_layout_set(self, ls, max, locations, width=None, height=None):
         #wid/height normally not specified when saving common from the mucked display
         
-        print "saving layout =", ls.name, " ", str(max), "Max ", str(locations), "size:", str(width), "x", str(height)
+        print("saving layout =", ls.name, " ", str(max), "Max ", str(locations), "size:", str(width), "x", str(height))
         ls_node = self.get_layout_set_node(ls.name)
         layout_node = self.get_layout_node(ls_node, max)
         if width: layout_node.setAttribute("width", str(width))
         if height: layout_node.setAttribute("height", str(height))
         
-        for (i, pos) in locations.iteritems():
+        for (i, pos) in locations.items():
             location_node = self.get_location_node(layout_node, i)
             location_node.setAttribute("x", str( locations[i][0] ))
             location_node.setAttribute("y", str( locations[i][1] ))
@@ -1274,7 +1274,7 @@ class Config:
                         dbn.removeAttribute("default")
             elif db_node.hasAttribute("default"): 
                 db_node.removeAttribute("default")
-        if self.supported_databases.has_key(db_name):
+        if db_name in self.supported_databases:
             if db_desc   is not None: self.supported_databases[db_name].dp_desc   = db_desc
             if db_ip     is not None: self.supported_databases[db_name].dp_ip     = db_ip
             if db_user   is not None: self.supported_databases[db_name].dp_user   = db_user
@@ -1328,7 +1328,7 @@ class Config:
             elif db_node.hasAttribute("default"): 
                                       db_node.removeAttribute("default")
 
-        if self.supported_databases.has_key(db_name):
+        if db_name in self.supported_databases:
             if db_desc   is not None: self.supported_databases[db_name].dp_desc   = db_desc
             if db_ip     is not None: self.supported_databases[db_name].dp_ip     = db_ip
             if db_user   is not None: self.supported_databases[db_name].dp_user   = db_user
@@ -1362,7 +1362,7 @@ class Config:
 
     def getDefaultSite(self):
         "Returns first enabled site or None"
-        for site_name,site in self.supported_sites.iteritems():
+        for site_name,site in self.supported_sites.items():
             if site.enabled:
                 return site_name
         return None
@@ -1385,11 +1385,11 @@ class Config:
         try:    hui['card_wd']        = int(self.ui.card_wd)
         except: hui['card_wd']        = 30
         
-        try:    hui['deck_type']      = unicode(self.ui.deck_type)
-        except: hui['deck_type']        = u'colour'
+        try:    hui['deck_type']      = str(self.ui.deck_type)
+        except: hui['deck_type']        = 'colour'
         
-        try:    hui['card_back']      = unicode(self.ui.card_back)
-        except: hui['card_back']        = u'back04'
+        try:    hui['card_back']      = str(self.ui.card_back)
+        except: hui['card_back']        = 'back04'
                 
         try:    hui['stat_range']        = self.ui.stat_range
         except: hui['stat_range']        = 'A'  # default is show stats for All-time, also S(session) and T(ime)
@@ -1538,9 +1538,9 @@ class Config:
     def get_supported_sites(self, all=False):
         """Returns the list of supported sites."""
         if all:
-            return self.supported_sites.keys()
+            return list(self.supported_sites.keys())
         else:
-            return [site_name for (site_name, site) in self.supported_sites.items() if site.enabled]
+            return [site_name for (site_name, site) in list(self.supported_sites.items()) if site.enabled]
 
     def get_site_parameters(self, site):
         """Returns a dict of the site parameters for the specified site"""
@@ -1570,9 +1570,9 @@ class Config:
         
         site_layouts = self.get_site_parameters(site)["layout_set"]
         
-        if site_layouts.has_key(game_type):
+        if game_type in site_layouts:
             return self.layout_sets[site_layouts[game_type]]
-        elif site_layouts.has_key("all"):
+        elif "all" in site_layouts:
             return self.layout_sets[site_layouts["all"]]
         else:
             return None
@@ -1613,12 +1613,12 @@ class Config:
         
     def get_aux_windows(self):
         """Gets the list of mucked window formats in the configuration."""
-        return self.aux_windows.keys()
+        return list(self.aux_windows.keys())
 
     def get_aux_parameters(self, name):
         """Gets a dict of mucked window parameters from the named mw."""
         param = {}
-        if self.aux_windows.has_key(name):
+        if name in self.aux_windows:
             for key in dir(self.aux_windows[name]):
                 if key.startswith('__'): continue
                 value = getattr(self.aux_windows[name], key)
@@ -1630,16 +1630,16 @@ class Config:
 
     def get_stat_sets(self):
         """Gets the list of stat block contents in the configuration."""
-        return self.stat_sets.keys()
+        return list(self.stat_sets.keys())
         
     def get_layout_sets(self):
         """Gets the list of block layouts in the configuration."""
-        return self.layout_sets.keys()
+        return list(self.layout_sets.keys())
         
     def get_layout_set_parameters(self, name):
         """Gets a dict of parameters from the named ls."""
         param = {}
-        if self.layout_sets.has_key(name):
+        if name in self.layout_sets:
             for key in dir(self.layout_sets[name]):
                 if key.startswith('__'): continue
                 value = getattr(self.layout_sets[name], key)
@@ -1652,14 +1652,14 @@ class Config:
     def get_supported_games(self):
         """Get the list of supported games."""
         sg = []
-        for game in self.supported_games.keys():
+        for game in list(self.supported_games.keys()):
             sg.append(self.supported_games[game].game_name)
         return sg
 
     def get_supported_games_parameters(self, name, game_type):
         """Gets a dict of parameters from the named gametype."""
         param = {}
-        if self.supported_games.has_key(name):
+        if name in self.supported_games:
             for key in dir(self.supported_games[name]):
                 if key.startswith('__'): continue
                 if key == ('game_stat_set'): continue
@@ -1672,9 +1672,9 @@ class Config:
             
             game_stat_set = getattr(self.supported_games[name], 'game_stat_set')
                 
-            if game_stat_set.has_key(game_type):
+            if game_type in game_stat_set:
                 param['game_stat_set'] = self.stat_sets[game_stat_set[game_type].stat_set]
-            elif game_stat_set.has_key("all"):
+            elif "all" in game_stat_set:
                 param['game_stat_set'] = self.stat_sets[game_stat_set["all"].stat_set]
             else:
                 return None
@@ -1694,70 +1694,70 @@ class Config:
         return( self.gui_cash_stats )
 
 if __name__== "__main__":
-    set_logfile(u"fpdb-log.txt")
+    set_logfile("fpdb-log.txt")
     c = Config()
     
-    print "\n----------- GENERAL -----------"
-    print c.general
+    print("\n----------- GENERAL -----------")
+    print(c.general)
 
-    print "\n----------- SUPPORTED SITES -----------"
-    for s in c.supported_sites.keys():
-        print c.supported_sites[s]
+    print("\n----------- SUPPORTED SITES -----------")
+    for s in list(c.supported_sites.keys()):
+        print(c.supported_sites[s])
 
-    print "\n----------- SUPPORTED GAMES -----------"
-    for game in c.supported_games.keys():
-        print c.supported_games[game]
+    print("\n----------- SUPPORTED GAMES -----------")
+    for game in list(c.supported_games.keys()):
+        print(c.supported_games[game])
 
-    print "\n----------- SUPPORTED DATABASES -----------"
-    for db in c.supported_databases.keys():
-        print c.supported_databases[db]
+    print("\n----------- SUPPORTED DATABASES -----------")
+    for db in list(c.supported_databases.keys()):
+        print(c.supported_databases[db])
 
-    print "\n----------- AUX WINDOW FORMATS -----------"
-    for w in c.aux_windows.keys():
-        print c.aux_windows[w]
+    print("\n----------- AUX WINDOW FORMATS -----------")
+    for w in list(c.aux_windows.keys()):
+        print(c.aux_windows[w])
     
-    print "\n----------- LAYOUT SETS FORMATS -----------"
-    for w in c.layout_sets.keys():
-        print c.layout_sets[w]
+    print("\n----------- LAYOUT SETS FORMATS -----------")
+    for w in list(c.layout_sets.keys()):
+        print(c.layout_sets[w])
     
-    print "\n----------- STAT SETS FORMATS -----------"
-    for w in c.stat_sets.keys():
-        print c.stat_sets[w]
+    print("\n----------- STAT SETS FORMATS -----------")
+    for w in list(c.stat_sets.keys()):
+        print(c.stat_sets[w])
 
-    print "\n----------- HAND HISTORY CONVERTERS -----------"
-    for w in c.hhcs.keys():
-        print c.hhcs[w]
+    print("\n----------- HAND HISTORY CONVERTERS -----------")
+    for w in list(c.hhcs.keys()):
+        print(c.hhcs[w])
 
-    print "\n----------- POPUP WINDOW FORMATS -----------"
-    for w in c.popup_windows.keys():
-        print c.popup_windows[w]
+    print("\n----------- POPUP WINDOW FORMATS -----------")
+    for w in list(c.popup_windows.keys()):
+        print(c.popup_windows[w])
         
-    print "\n-----------  DATABASE PARAMS -----------"
-    print "db    = ", c.get_db_parameters()
+    print("\n-----------  DATABASE PARAMS -----------")
+    print("db    = ", c.get_db_parameters())
     
-    print "\n-----------  HUD PARAMS -----------"
-    print "hud params ="
-    for hud_param, value in c.get_hud_ui_parameters().iteritems():
-        print " %s = %s" % (hud_param, value)
+    print("\n-----------  HUD PARAMS -----------")
+    print("hud params =")
+    for hud_param, value in c.get_hud_ui_parameters().items():
+        print(" %s = %s" % (hud_param, value))
         
-    print "\n-----------  STARTUP PATH -----------"
-    print "start up path = ", c.execution_path("")
+    print("\n-----------  STARTUP PATH -----------")
+    print("start up path = ", c.execution_path(""))
     
-    print "\n-----------  GUI CASH STATS -----------"
-    print "gui_cash_stats =", c.gui_cash_stats
+    print("\n-----------  GUI CASH STATS -----------")
+    print("gui_cash_stats =", c.gui_cash_stats)
 
-    print "\n----------- ENVIRONMENT CONSTANTS -----------"
-    print "Configuration.install_method {source,exe,app} =", INSTALL_METHOD
-    print "Configuration.fpdb_root_path =", FPDB_ROOT_PATH, type(FPDB_ROOT_PATH)
-    print "Configuration.graphics_path =", GRAPHICS_PATH, type(GRAPHICS_PATH)
-    print "Configuration.appdata_path =", APPDATA_PATH, type(APPDATA_PATH)
-    print "Configuration.config_path =", CONFIG_PATH, type(CONFIG_PATH)
-    print "Configuration.pyfpdb_path =", PYFPDB_PATH, type(PYFPDB_PATH)
-    print "Configuration.os_family {Linux,Mac,XP,Win7} =", OS_FAMILY
-    print "Configuration.posix {True/False} =", POSIX
-    print "Configuration.python_version =", PYTHON_VERSION
-    print "\n\n----------- END OF CONFIG REPORT -----------"
+    print("\n----------- ENVIRONMENT CONSTANTS -----------")
+    print("Configuration.install_method {source,exe,app} =", INSTALL_METHOD)
+    print("Configuration.fpdb_root_path =", FPDB_ROOT_PATH, type(FPDB_ROOT_PATH))
+    print("Configuration.graphics_path =", GRAPHICS_PATH, type(GRAPHICS_PATH))
+    print("Configuration.appdata_path =", APPDATA_PATH, type(APPDATA_PATH))
+    print("Configuration.config_path =", CONFIG_PATH, type(CONFIG_PATH))
+    print("Configuration.pyfpdb_path =", PYFPDB_PATH, type(PYFPDB_PATH))
+    print("Configuration.os_family {Linux,Mac,XP,Win7} =", OS_FAMILY)
+    print("Configuration.posix {True/False} =", POSIX)
+    print("Configuration.python_version =", PYTHON_VERSION)
+    print("\n\n----------- END OF CONFIG REPORT -----------")
 
-    print "press enter to end"
+    print("press enter to end")
     sys.stdin.readline()
 

@@ -106,8 +106,8 @@ class GuiReplayer(QWidget):
     def paintEvent(self, event):
         if self.tableImage is None or self.playerBackdrop is None:
             try:
-                self.playerBackdrop = QImage(os.path.join(self.conf.graphics_path, u"playerbackdrop.png"))
-                self.tableImage = QImage(os.path.join(self.conf.graphics_path, u"Table.png"))
+                self.playerBackdrop = QImage(os.path.join(self.conf.graphics_path, "playerbackdrop.png"))
+                self.tableImage = QImage(os.path.join(self.conf.graphics_path, "Table.png"))
             except:
                 return
         if self.cardImages is None:
@@ -139,7 +139,7 @@ class GuiReplayer(QWidget):
         convertx = lambda x: int(x * self.tableImage.width() * 0.8) + self.tableImage.width() / 2
         converty = lambda y: int(y * self.tableImage.height() * 0.6) + self.tableImage.height() / 2
 
-        for player in state.players.values():
+        for player in list(state.players.values()):
             playerx = convertx(player.x)
             playery = converty(player.y)
             painter.drawImage(QPoint(playerx - self.playerBackdrop.width() / 2, playery - 3), self.playerBackdrop)
@@ -218,7 +218,7 @@ class GuiReplayer(QWidget):
         seenStreets = []
         for street in hand.allStreets:
             if state.called > 0:
-                for player in state.players.values():
+                for player in list(state.players.values()):
                     if player.stack == 0:
                         state.allin = True
                         break
@@ -237,7 +237,7 @@ class GuiReplayer(QWidget):
         self.states.append(state)
 
         # Clear and repopulate the row of buttons
-        for idx in reversed(range(self.buttonBox.count())):
+        for idx in reversed(list(range(self.buttonBox.count()))):
             self.buttonBox.takeAt(idx).widget().setParent(None)
         self.buttonBox.addWidget(self.prevButton)
         self.prevButton.setEnabled(self.handidx > 0)
@@ -357,7 +357,7 @@ class TableState:
 
         self.renderBoard.add(phase)
 
-        for player in self.players.values():
+        for player in list(self.players.values()):
             player.justacted = False
             if player.chips > self.called:
                 player.stack += player.chips - self.called
@@ -371,7 +371,7 @@ class TableState:
         self.allinThisStreet = False
 
     def updateForAction(self, action):
-        for player in self.players.values():
+        for player in list(self.players.values()):
             player.justacted = False
 
         player = self.players[action[0]]
@@ -413,24 +413,24 @@ class TableState:
             player.chips += action[2]
             player.stack -= action[2]
         else:
-            print "unhandled action: " + str(action)
+            print("unhandled action: " + str(action))
 
         if player.stack == 0:
             self.allinThisStreet = True
 
     def endHand(self, collectees, returned):
         self.pot = Decimal(0)
-        for player in self.players.values():
+        for player in list(self.players.values()):
             player.justacted = False
             player.chips = Decimal(0)
             if self.gamebase == 'draw':
                 player.holecards = player.streetcards[self.street]
-        for name,amount in collectees.items():
+        for name,amount in list(collectees.items()):
             player = self.players[name]
             player.chips += amount
             player.action = "collected"
             player.justacted = True
-        for name, amount in returned.items():
+        for name, amount in list(returned.items()):
             self.players[name].stack += amount
 
 class Player:

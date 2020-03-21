@@ -77,12 +77,12 @@ def try_import(modulename):
 
 def success(message):
     if verbose:
-        print message
+        print(message)
     success_list.append(message)
 
 def failure(message):
     if verbose:
-        print _("Error:"), message
+        print(_("Error:"), message)
     failure_list.append(message)
 
 
@@ -95,7 +95,7 @@ class ChooseLanguage:
         
         self.listbox.insert(END,("Use the system language settings"))
         self.listbox.insert(END,("en -- Always use English for FPDB"))
-        for key in sorted(language_dict.iterkeys()):
+        for key in sorted(language_dict.keys()):
             self.listbox.insert(END,(key + " -- " + language_dict[key]))
         self.listbox.pack(fill=BOTH, expand=1)
         self.listbox.select_set(0)
@@ -123,7 +123,7 @@ class ChooseLanguage:
 #  two messages because L10n not guaranteed to be available
 #
 
-from Tkinter import *
+from tkinter import *
 
 try:
     module = __import__("sys")
@@ -221,7 +221,7 @@ if config.install_method == "exe":
 # finally, invoke fpdb
 #
 import os
-os.chdir(os.path.join(config.fpdb_root_path, u"pyfpdb"))
+os.chdir(os.path.join(config.fpdb_root_path, "pyfpdb"))
 
 if config.os_family in ("XP", "Win7"):
     os.execvpe('pythonw.exe', list(('pythonw.exe', 'fpdb.pyw', initial_run, '-r'))+sys.argv[1:], os.environ)

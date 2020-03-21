@@ -37,13 +37,13 @@ class OnGame(HandHistoryConverter):
     siteId   = 5 # Needs to match id entry in Sites database
 
     mixes = { } # Legal mixed games
-    sym = {'USD': "\$", 'CAD': "\$", 'T$': "", "EUR": u"\u20ac", "GBP": "\xa3"}
+    sym = {'USD': "\$", 'CAD': "\$", 'T$': "", "EUR": "\u20ac", "GBP": "\xa3"}
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",    # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|",     # Currency symbols - Euro(cp1252, utf-8)
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|",     # Currency symbols - Euro(cp1252, utf-8)
                            'PLYR': r'(?P<PNAME>.+?)',
-                            'CUR': u"(\$|\xe2\x82\xac|\u20ac||\£|)",
-                           'NUM' : u".,\dKM",
+                            'CUR': "(\$|\xe2\x82\xac|\u20ac||\£|)",
+                           'NUM' : ".,\dKM",
                     }
     
     Lim_Blinds = {      '0.04': ('0.01', '0.02'),    '0.10': ('0.02', '0.05'),      
@@ -66,7 +66,7 @@ class OnGame(HandHistoryConverter):
                       '1000.00': ('250.00', '500.00'),'1000': ('250.00', '500.00'),
                   }
     
-    currencies = { u'\u20ac':'EUR', u'\xe2\x82\xac':'EUR', '$':'USD', '':'T$' }
+    currencies = { '\u20ac':'EUR', '\xe2\x82\xac':'EUR', '$':'USD', '':'T$' }
 
     limits = { 'NO_LIMIT':'nl', 'POT_LIMIT':'pl', 'LIMIT':'fl'}
 
@@ -84,13 +84,13 @@ class OnGame(HandHistoryConverter):
 
     # Static regexes
     # ***** End of hand R5-75443872-57 *****
-    re_Identify   = re.compile(u'\*{5}\sHistory\sfor\shand\s[A-Z0-9\-]+\s')
-    re_SplitHands = re.compile(u'\*\*\*\*\*\sEnd\sof\shand\s[-A-Z\d]+.*\n+(?=\*)')
+    re_Identify   = re.compile('\*{5}\sHistory\sfor\shand\s[A-Z0-9\-]+\s')
+    re_SplitHands = re.compile('\*\*\*\*\*\sEnd\sof\shand\s[-A-Z\d]+.*\n+(?=\*)')
 
     #TODO: detect play money
     # "Play money" rather than "Real money" and set currency accordingly
     # Table:\s(\[SPEED\]\s)?(?P<TABLE>[-\'\w\#\s\.]+)\s\[\d+\]\s\( 
-    re_HandInfo = re.compile(u"""
+    re_HandInfo = re.compile("""
             \*{5}\sHistory\sfor\shand\s(?P<HID>[-A-Z\d]+)(?P<TOUR>\s\(TOURNAMENT:(\s\"(?P<NAME>.+?)\",)?\s(?P<TID>[-A-Z\d]+)?(?P<BUY>,\sbuy-in:\s(?P<BUYINCUR>[%(LS)s]?)(?P<BUYIN>[%(NUM)s]+))?\))?\s\*{5}\s?
             Start\shand:\s(?P<DATETIME>.+?)\s?
             Table:\s(\[SPEED\]\s)?(?P<TABLE>.+?)\s\[(?P<TABLENO>\d+)\]\s\( 
@@ -102,7 +102,7 @@ class OnGame(HandHistoryConverter):
             )
             """ % substitutions, re.MULTILINE|re.DOTALL|re.VERBOSE)
 
-    re_TailSplitHands = re.compile(u'(\*\*\*\*\*\sEnd\sof\shand\s[-A-Z\d]+.*\n)(?=\*)')
+    re_TailSplitHands = re.compile('(\*\*\*\*\*\sEnd\sof\shand\s[-A-Z\d]+.*\n)(?=\*)')
     re_Button       = re.compile('Button: seat (?P<BUTTON>\d+)', re.MULTILINE)  # Button: seat 2
     re_Board        = re.compile(r"\[(?P<CARDS>.+)\]")
     re_Max          = re.compile(r"Players\sin\sround:\s\d+\s\((?P<MAX>\d+)\)")
@@ -121,7 +121,7 @@ class OnGame(HandHistoryConverter):
     #Seat 1: phantomaas ($27.11)
     #Seat 5: mleo17 ($9.37)
     #Seat 2: Montferat (1500)
-    re_PlayerInfo = re.compile(u'Seat (?P<SEAT>[0-9]+):\s(?P<PNAME>.*)\s\((%(LS)s)?(?P<CASH>[%(NUM)s]+)\)' % substitutions)
+    re_PlayerInfo = re.compile('Seat (?P<SEAT>[0-9]+):\s(?P<PNAME>.*)\s\((%(LS)s)?(?P<CASH>[%(NUM)s]+)\)' % substitutions)
 
     def compilePlayerRegexs(self, hand):
         players = set([player[1] for player in hand.players])
@@ -409,7 +409,7 @@ class OnGame(HandHistoryConverter):
         # streets PREFLOP, PREDRAW, and THIRD are special cases beacause
         # we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
                     hand.hero = found.group('PNAME')
@@ -417,12 +417,12 @@ class OnGame(HandHistoryConverter):
                     hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
                     
         for street in hand.holeStreets:
-            if hand.streets.has_key(street):
+            if street in hand.streets:
                 if not hand.streets[street] or street in ('PREFLOP', 'DEAL') or hand.gametype['base'] == 'hold': continue  # already done these
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
                     player = found.group('PNAME')
-                    newcards = [c for c in found.group('CARDS').split(', ') if c != u'-']
+                    newcards = [c for c in found.group('CARDS').split(', ') if c != '-']
     
                     if street == 'THIRD' and len(newcards) == 3: # hero in stud game
                         hand.hero = player

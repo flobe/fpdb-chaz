@@ -35,12 +35,12 @@ class PartyPoker(HandHistoryConverter):
     codepage = ("utf8", "cp1252")
     siteId = 9
     filetype = "text"
-    sym        = {'USD': "\$", 'EUR': u"\u20ac", 'T$': "", 'play':'play'}
-    currencies = {"\$": "USD", "$": "USD", u"\xe2\x82\xac": "EUR", u"\u20ac": "EUR", '': "T$", 'play':'play'}
+    sym        = {'USD': "\$", 'EUR': "\u20ac", 'T$': "", 'play':'play'}
+    currencies = {"\$": "USD", "$": "USD", "\xe2\x82\xac": "EUR", "\u20ac": "EUR", '': "T$", 'play':'play'}
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR",            # legal ISO currency codes
-                            'LS' : u"\$|\u20ac|\xe2\x82\xac|",    # Currency symbols - Euro(cp1252, utf-8)
-                           'NUM' : u".,'\dKMB",
+                            'LS' : "\$|\u20ac|\xe2\x82\xac|",    # Currency symbols - Euro(cp1252, utf-8)
+                           'NUM' : ".,'\dKMB",
                     }
     limits = { 'NL':'nl', 'PL':'pl', '':'fl', 'FL':'fl', 'Limit':'fl' }
     games = {                         # base, category
@@ -105,7 +105,7 @@ class PartyPoker(HandHistoryConverter):
              }
 
     # Static regexes
-    re_GameInfo = re.compile(u"""
+    re_GameInfo = re.compile("""
             \*{5}\sHand\sHistory\s(F|f)or\sGame\s(?P<HID>\d+)\w+?\s\*{5}(\s\((?P<SITE>Poker\sStars|PokerMaster|Party|IPoker|Pacific|WPN)\))?\s+
             (.+?\shas\sleft\sthe\stable\.\s+)*
             (.+?\sfinished\sin\s\d+\splace\.\s+)*
@@ -126,7 +126,7 @@ class PartyPoker(HandHistoryConverter):
             (?P<DATETIME>.+)
             """ % substitutions, re.VERBOSE | re.UNICODE)
 
-    re_HandInfo     = re.compile(u"""
+    re_HandInfo     = re.compile("""
             ^Table\s(?P<TABLE>.+?)?\s+
             ((?: \#|\(|)(?P<TABLENO>\d+)\)?\s+)?
             (\(No\sDP\)\s)?
@@ -135,7 +135,7 @@ class PartyPoker(HandHistoryConverter):
             (\s+Total\s+number\s+of\s+players\s+\:\s+(?P<PLYRS>\d+)/?(?P<MAX>\d+)?)?
             """, re.VERBOSE|re.MULTILINE|re.DOTALL)
 
-    re_GameInfoTrny1     = re.compile(u"""
+    re_GameInfoTrny1     = re.compile("""
             \*{5}\sHand\sHistory\s(F|f)or\sGame\s(?P<HID>\d+)\w+?\s\*{5}\s+
             (?P<LIMIT>(NL|PL|FL|))\s*
             (?P<GAME>(Texas\sHold\'em|Omaha\sHi-Lo|Omaha(\sHi)?|7\sCard\sStud\sHi-Lo|7\sCard\sStud|Double\sHold\'em|Short\sDeck))\s+
@@ -152,7 +152,7 @@ class PartyPoker(HandHistoryConverter):
             (?P<DATETIME>.+)
             """ % substitutions, re.VERBOSE | re.UNICODE)
     
-    re_GameInfoTrny2     = re.compile(u"""
+    re_GameInfoTrny2     = re.compile("""
             \*{5}\sHand\sHistory\s(F|f)or\sGame\s(?P<HID>\d+)\w+?\s\*{5}\s+
             (?P<LIMIT>(NL|PL|FL|))\s*
             (?P<GAME>(Texas\sHold\'em|Omaha\sHi-Lo|Omaha(\sHi)?|7\sCard\sStud\sHi-Lo|7\sCard\sStud|Double\sHold\'em|Short\sDeck))\s+
@@ -162,7 +162,7 @@ class PartyPoker(HandHistoryConverter):
             (?P<DATETIME>.+)
             """ % substitutions, re.VERBOSE | re.UNICODE)
     
-    re_GameInfoTrny3     = re.compile(u"""
+    re_GameInfoTrny3     = re.compile("""
             \*{5}\sHand\sHistory\s(F|f)or\sGame\s(?P<HID>\d+)\w+?\s\*{5}\s\((?P<SITE>Poker\sStars|PokerMaster|Party|IPoker|Pacific|WPN)\)\s+
             Tourney\sHand\s
             (?P<LIMIT>(NL|PL|FL|))\s*
@@ -183,15 +183,15 @@ class PartyPoker(HandHistoryConverter):
             Level:\s*(?P<LEVEL>\d+)
         """, re.VERBOSE)
 
-    re_PlayerInfo   = re.compile(u"""
+    re_PlayerInfo   = re.compile("""
           (S|s)eat\s?(?P<SEAT>\d+):\s
           (?P<PNAME>.*)\s
           \(\s*[%(LS)s]?(?P<CASH>[%(NUM)s]+)\s*(?:%(LEGAL_ISO)s|)\s*\)
           """ % substitutions, re.VERBOSE| re.UNICODE)
 
-    re_NewLevel = re.compile(u"^Blinds(-Antes)?\((?P<SB>[%(NUM)s ]+)/(?P<BB>[%(NUM)s ]+)(?:\s*-\s*(?P<ANTE>[%(NUM)s ]+))?\)" % substitutions, re.VERBOSE|re.MULTILINE|re.DOTALL)
+    re_NewLevel = re.compile("^Blinds(-Antes)?\((?P<SB>[%(NUM)s ]+)/(?P<BB>[%(NUM)s ]+)(?:\s*-\s*(?P<ANTE>[%(NUM)s ]+))?\)" % substitutions, re.VERBOSE|re.MULTILINE|re.DOTALL)
     re_CountedSeats = re.compile("^Total\s+number\s+of\s+players\s*:\s*(?P<COUNTED_SEATS>\d+)", re.MULTILINE)
-    re_Identify     = re.compile(u'\*{5}\sHand\sHistory\s[fF]or\sGame\s\d+\w+?\s')
+    re_Identify     = re.compile('\*{5}\sHand\sHistory\s[fF]or\sGame\s\d+\w+?\s')
     re_SplitHands   = re.compile('\n\n+')
     re_TailSplitHands   = re.compile('(\x00+)')
     lineSplitter    = '\n'
@@ -210,7 +210,7 @@ class PartyPoker(HandHistoryConverter):
         list = HandHistoryConverter.allHandsAsList(self)
         if list is None:
             return []
-        return filter(lambda text: len(text.strip()), list)
+        return [text for text in list if len(text.strip())]
 
     def compilePlayerRegexs(self,  hand):
         players = set([player[1] for player in hand.players])
@@ -219,7 +219,7 @@ class PartyPoker(HandHistoryConverter):
             player_re = "(?P<PNAME>" + "|".join(map(re.escape, players)) + ")"
             subst = {'PLYR': player_re, 'CUR_SYM': self.sym[hand.gametype['currency']],
                 'CUR': hand.gametype['currency'] if hand.gametype['currency']!='T$' else '(chips|)',
-                'BRAX' : u"\[\(\)\]"
+                'BRAX' : "\[\(\)\]"
                     }
             self.re_PostSB = re.compile(
                 r"%(PLYR)s posts small blind [%(BRAX)s]?%(CUR_SYM)s?(?P<SB>[.,0-9]+)\s*(%(CUR)s)?[%(BRAX)s]?\.?\s*$"
@@ -239,7 +239,7 @@ class PartyPoker(HandHistoryConverter):
             self.re_HeroCards = re.compile(
                 r"Dealt to %(PLYR)s \[\s*(?P<NEWCARDS>.+)\s*\]" % subst,
                 re.MULTILINE)
-            self.re_Action = re.compile(ur"""
+            self.re_Action = re.compile(r"""
                 (?P<PNAME>.+?)\s(?P<ATYPE>bets|checks|raises|completes|bring-ins|calls|folds|is\sall-In|double\sbets)
                 (?:\s*[%(BRAX)s]?\s?%(CUR_SYM)s?(?P<BET>[.,\d]+)\s*(%(CUR)s)?\s?[%(BRAX)s]?)?
                 (\sto\s[.,\d]+)?
@@ -280,7 +280,7 @@ class PartyPoker(HandHistoryConverter):
                ]
 
     def determineGameType(self, handText):
-        handText = handText.replace(u'\x00', u'')
+        handText = handText.replace('\x00', '')
         info, extra = {}, {}
         m = self.re_GameInfo.search(handText)
         if not m:
@@ -415,7 +415,7 @@ class PartyPoker(HandHistoryConverter):
 
     def readHandInfo(self, hand):
         info, m2, extra, type3 = {}, None, {}, False
-        hand.handText = hand.handText.replace(u'\x00', u'')
+        hand.handText = hand.handText.replace('\x00', '')
         if self.re_emailedHand.search(hand.handText):
             hand.emailedHand = True
         else:
@@ -504,15 +504,15 @@ class PartyPoker(HandHistoryConverter):
                     hand.buyinCurrency = "NA"
                     if info[key].find("$")!=-1:
                         hand.buyinCurrency="USD"
-                    elif info[key].find(u"€")!=-1:
+                    elif info[key].find("€")!=-1:
                         hand.buyinCurrency="EUR"
                     else:
                         log.error(_("PartyPokerToFpdb.readHandInfo: Failed to detect currency Hand ID: '%s' - '%s'") % (hand.handid, info[key]))
                         raise FpdbParseError
-                    info[key] = self.clearMoneyString(info[key].strip(u'$€'))
+                    info[key] = self.clearMoneyString(info[key].strip('$€'))
                     hand.buyin = int(100*Decimal(info[key]))
                     if 'FEE' in info and info['FEE']!=None:
-                        info['FEE'] = self.clearMoneyString(info['FEE'].strip(u'$€'))
+                        info['FEE'] = self.clearMoneyString(info['FEE'].strip('$€'))
                         hand.fee = int(100*Decimal(info['FEE']))
             if key == 'LEVEL':
                 hand.level = info[key]
@@ -715,14 +715,14 @@ class PartyPoker(HandHistoryConverter):
     def readHoleCards(self, hand):
         # we need to grab hero's cards
         for street in ('PREFLOP',):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
                     hand.hero = found.group('PNAME')
                     newcards = renderCards(found.group('NEWCARDS'))
                     hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
                     
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             for found in m:
@@ -825,4 +825,4 @@ class PartyPoker(HandHistoryConverter):
 def renderCards(string):
     "Splits strings like ' Js, 4d '"
     cards = string.strip().split(' ')
-    return filter(len, map(lambda x: x.strip(' ,'), cards))
+    return list(filter(len, [x.strip(' ,') for x in cards]))

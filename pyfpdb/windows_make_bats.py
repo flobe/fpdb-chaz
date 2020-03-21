@@ -27,7 +27,7 @@ try:
     import re
 
     if os.name != 'nt':
-        print _("This script is only for Windows.")
+        print(_("This script is only for Windows."))
         exit()
 
     dirs = re.split(os.pathsep, os.environ['PATH'])
@@ -54,13 +54,13 @@ try:
             bat.close()
             i = i + 1
     else:
-        print _("No gtk directories found in your path.") + " " + _("Install gtk or edit the path manually.")
+        print(_("No gtk directories found in your path.") + " " + _("Install gtk or edit the path manually."))
 
 except SystemExit:
     pass
 
 except:
-    print "Error:", str(sys.exc_info())
+    print("Error:", str(sys.exc_info()))
     pass
 
 # sys.stdin.readline()

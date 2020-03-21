@@ -75,14 +75,14 @@ class GuiBulkImport(QWidget):
                     
                 completionMessage = _('Bulk import done: Stored: %d, Duplicates: %d, Partial: %d, Skipped: %d, Errors: %d, Time: %s seconds, Stored/second: %.0f')\
                     % (stored, dups, partial, skipped, errs, ttime, (stored+0.0) / ttime)
-                print completionMessage
+                print(completionMessage)
                 log.info(completionMessage)
 
                 self.importer.clearFileList()
                 
                 self.settings['global_lock'].release()
         else:
-            print _("bulk import aborted - global lock not available")
+            print(_("bulk import aborted - global lock not available"))
 
     def get_vbox(self):
         """returns the vbox of this thread"""

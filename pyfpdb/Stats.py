@@ -1522,17 +1522,17 @@ if __name__== "__main__":
     stat_dict = db_connection.get_stats_from_hand(h, "ring")
     hand_instance = Hand.hand_factory(h, c, db_connection)
     
-    for player in stat_dict.keys():
-        print (_("Example stats. Player = %s, Hand = %s:") % (player, h))
+    for player in list(stat_dict.keys()):
+        print((_("Example stats. Player = %s, Hand = %s:") % (player, h)))
         for attr in STATLIST:
-            print attr, " : ", do_stat(stat_dict, player=player, stat=attr, hand_instance=hand_instance)
+            print(attr, " : ", do_stat(stat_dict, player=player, stat=attr, hand_instance=hand_instance))
         break
 
-    print
-    print _("Legal stats:")
-    print _("(add _0 to name to display with 0 decimal places, _1 to display with 1, etc)")
+    print()
+    print(_("Legal stats:"))
+    print(_("(add _0 to name to display with 0 decimal places, _1 to display with 1, etc)"))
     stat_descriptions = get_valid_stats()
     for stat in STATLIST:
-        print stat, " : ", stat_descriptions[stat]
+        print(stat, " : ", stat_descriptions[stat])
 
 

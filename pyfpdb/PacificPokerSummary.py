@@ -40,13 +40,13 @@ class PacificPokerSummary(TourneySummary):
 
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",      # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20AC|", # legal currency symbols
-                           'NUM' : u".,\d\xa0"                     # legal characters in number format
+                            'LS' : "\$|\xe2\x82\xac|\u20AC|", # legal currency symbols
+                           'NUM' : ".,\d\xa0"                     # legal characters in number format
                     }
     
-    re_Identify = re.compile(u'\*{5}\s(Cassava|888poker|888)(\.[a-z]{2})? Tournament Summary\s\*{5}')
+    re_Identify = re.compile('\*{5}\s(Cassava|888poker|888)(\.[a-z]{2})? Tournament Summary\s\*{5}')
     
-    re_TourneyInfo = re.compile(u"""
+    re_TourneyInfo = re.compile("""
                         Tournament\sID:\s(?P<TOURNO>[0-9]+)\s+
                         Buy-In:\s(?P<BUYIN>(((?P<BIAMT>(?P<CURRENCY1>%(LS)s)?[%(NUM)s]+\s?(?P<CURRENCY2>%(LS)s)?)(\s\+\s?(?P<BIRAKE>(%(LS)s)?[%(NUM)s]+\s?(%(LS)s)?))?)|(Free)|(.+?)))\s+
                         (Rebuy:\s[%(LS)s](?P<REBUYAMT>[%(NUM)s]+)\s?(%(LS)s)?\s+)?
@@ -56,7 +56,7 @@ class PacificPokerSummary(TourneySummary):
                         ^(?P<PNAME>.+?)\sfinished\s(?P<RANK>[0-9]+)\/(?P<ENTRIES>[0-9]+)(\sand\swon\s(?P<WCURRENCY>[%(LS)s])?(?P<WINNINGS>[%(NUM)s]+)\s?(?P<WCURRENCY2>[%(LS)s])?)?
                                """ % substitutions ,re.VERBOSE|re.MULTILINE|re.DOTALL)
     
-    re_Category = re.compile(u"""
+    re_Category = re.compile("""
           (?P<LIMIT>No\sLimit|Fix\sLimit|Pot\sLimit)\s
           (?P<GAME>Holdem|Omaha|OmahaHL|Hold\'em|Omaha\sHi/Lo|OmahaHL)
                                """ % substitutions ,re.VERBOSE|re.MULTILINE|re.DOTALL)
@@ -65,7 +65,7 @@ class PacificPokerSummary(TourneySummary):
 
     @staticmethod
     def getSplitRe(self, head):
-        re_SplitTourneys = re.compile(u'\*\*\*\*\* (?:Cassava|888poker|888.es) Tournament Summary \*\*\*\*\*')
+        re_SplitTourneys = re.compile('\*\*\*\*\* (?:Cassava|888poker|888.es) Tournament Summary \*\*\*\*\*')
         return re_SplitTourneys
 
     def parseSummary(self):
@@ -123,7 +123,7 @@ class PacificPokerSummary(TourneySummary):
             
         if currency:
             if currency == "$":     self.buyinCurrency="USD"
-            elif currency == u"€":  self.buyinCurrency="EUR"
+            elif currency == "€":  self.buyinCurrency="EUR"
         elif self.buyin == 0:
             self.buyinCurrency="FREE"
         else:
@@ -141,10 +141,10 @@ class PacificPokerSummary(TourneySummary):
             winnings = int(100*self.convert_to_decimal(mg['WINNINGS']))
             if mg.get('WCURRENCY'):
                 if mg['WCURRENCY'] == "$":     self.currency="USD"
-                elif mg['WCURRENCY'] == u"€":  self.currency="EUR"
+                elif mg['WCURRENCY'] == "€":  self.currency="EUR"
             elif mg.get('WCURRENCY2'):
                 if mg['WCURRENCY2'] == "$":     self.currency="USD"
-                elif mg['WCURRENCY2'] == u"€":  self.currency="EUR"
+                elif mg['WCURRENCY2'] == "€":  self.currency="EUR"
         if 'PREBUYS' in mg and mg['PREBUYS'] != None:
             rebuyCount = int(mg['PREBUYS'])
         if 'PADDONS' in mg and mg['PADDONS'] != None:

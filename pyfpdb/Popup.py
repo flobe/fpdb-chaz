@@ -104,7 +104,7 @@ class default(Popup):
     def create(self):
         super(default, self).create()
         player_id = None
-        for id in self.stat_dict.keys():
+        for id in list(self.stat_dict.keys()):
             if self.seat == self.stat_dict[id]['seat']:
                 player_id = id
         if player_id is None:
@@ -138,7 +138,7 @@ class Submenu(Popup):
         super(Submenu, self).create()
 
         player_id = None
-        for id in self.stat_dict.keys():
+        for id in list(self.stat_dict.keys()):
             if self.seat == self.stat_dict[id]['seat']:
                 player_id = id
         if player_id is None:
@@ -214,7 +214,7 @@ class Multicol(Popup):
         super(Multicol, self).create()
 
         player_id = None
-        for id in self.stat_dict.keys():
+        for id in list(self.stat_dict.keys()):
             if self.seat == self.stat_dict[id]['seat']:
                 player_id = id
         if player_id is None:

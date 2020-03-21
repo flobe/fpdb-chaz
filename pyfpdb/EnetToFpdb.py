@@ -40,9 +40,9 @@ class Enet(HandHistoryConverter):
     sym = {'USD': "\$", 'CAD': "\$", 'T$': "", "EUR": "\xe2\x82\xac", "GBP": "\£", "play": ""}         # ADD Euro, Sterling, etc HERE
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",      # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|\£|", # legal currency symbols - Euro(cp1252, utf-8)
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|\£|", # legal currency symbols - Euro(cp1252, utf-8)
                            'PLYR': r'(?P<PNAME>.+?)',
-                            'CUR': u"(\$|\xe2\x82\xac|\u20ac||\£|)",
+                            'CUR': "(\$|\xe2\x82\xac|\u20ac||\£|)",
                           'BRKTS': r'(\(dealer\) |\(small blind\) |\(big blind\) |\(dealer\)\(small blind\) |\(dealer\)\(big blind\) | )?',
                            'NUM' : r'.,\d',
                     }
@@ -76,10 +76,10 @@ class Enet(HandHistoryConverter):
                               "Hold'em" : ('hold','holdem'),
                                 'Omaha' : ('hold','omahahi'),
                }
-    currencies = { u'€':'EUR', '$':'USD', '':'T$', u'£':'GBP' }
+    currencies = { '€':'EUR', '$':'USD', '':'T$', '£':'GBP' }
 
     # Static regexes
-    re_GameInfo     = re.compile(u"""
+    re_GameInfo     = re.compile("""
           Game\s\#(?P<HID>[0-9]+):\s+
           (\{.*\}\s+)?(Tournament\s\#                # open paren of tournament info
           (?P<TOURNO>\d+),\s
@@ -96,7 +96,7 @@ class Enet(HandHistoryConverter):
           (?P<DATETIME>.*$)
         """ % substitutions, re.MULTILINE|re.VERBOSE)
 
-    re_PlayerInfo   = re.compile(u"""
+    re_PlayerInfo   = re.compile("""
           ^Seat\s(?P<SEAT>[0-9]+):\s
           (?P<PNAME>.*)\s
           \((%(LS)s)?(?P<CASH>[%(NUM)s]+)\sin\schips\)""" % substitutions, 
@@ -109,7 +109,7 @@ class Enet(HandHistoryConverter):
           (Seat\s\#(?P<BUTTON>\d+)\sis\sthe\sbutton)?""", 
           re.MULTILINE|re.VERBOSE)
 
-    re_Identify     = re.compile(u'^Game\s\#\d+:')
+    re_Identify     = re.compile('^Game\s\#\d+:')
     re_SplitHands   = re.compile('\n\n+')
     re_TailSplitHands   = re.compile('(\n\n+)')
     re_Button       = re.compile('Seat #(?P<BUTTON>\d+) is the button', re.MULTILINE)
@@ -241,9 +241,9 @@ class Enet(HandHistoryConverter):
                     else:
                         if info[key].find("$")!=-1:
                             hand.buyinCurrency="USD"
-                        elif info[key].find(u"£")!=-1:
+                        elif info[key].find("£")!=-1:
                             hand.buyinCurrency="GBP"
-                        elif info[key].find(u"€")!=-1:
+                        elif info[key].find("€")!=-1:
                             hand.buyinCurrency="EUR"
                         elif re.match("^[0-9+]*$", info[key]):
                             hand.buyinCurrency="play"
@@ -252,8 +252,8 @@ class Enet(HandHistoryConverter):
                             log.error(_("EnetToFpdb.readHandInfo: Failed to detect currency.") + " Hand ID: %s: '%s'" % (hand.handid, info[key]))
                             raise FpdbParseError
 
-                        info['BIAMT'] = info['BIAMT'].strip(u'$€£')
-                        info['BIRAKE'] = info['BIRAKE'].strip(u'$€£')
+                        info['BIAMT'] = info['BIAMT'].strip('$€£')
+                        info['BIRAKE'] = info['BIRAKE'].strip('$€£')
                         hand.buyin = int(100*Decimal(self.clearMoneyString(info['BIAMT'])))
                         hand.fee = int(100*Decimal(self.clearMoneyString(info['BIRAKE'])))
             if key == 'LEVEL':
@@ -336,7 +336,7 @@ class Enet(HandHistoryConverter):
 #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
 #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
 #                    if m == None:

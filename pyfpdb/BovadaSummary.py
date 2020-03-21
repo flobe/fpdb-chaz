@@ -30,14 +30,14 @@ class BovadaSummary(TourneySummary):
     
     substitutions = {
                          'LEGAL_ISO' : "USD",      # legal ISO currency codes
-                                'LS' : u"\$|", # legal currency symbols - Euro(cp1252, utf-8)
+                                'LS' : "\$|", # legal currency symbols - Euro(cp1252, utf-8)
                                'PLYR': r'(?P<PNAME>.+?)',
-                                'CUR': u"(\$|)",
-                                'NUM' :u".,\d",
+                                'CUR': "(\$|)",
+                                'NUM' :".,\d",
                         }
     codepage = ("utf8", "cp1252")
     
-    re_Identify = re.compile(u'(Ignition|Bovada|Bodog(\.eu|\sUK|\sCanada|88)?)\sHand')
+    re_Identify = re.compile('(Ignition|Bovada|Bodog(\.eu|\sUK|\sCanada|88)?)\sHand')
     re_AddOn = re.compile(r"^%(PLYR)s  ?\[ME\] : Addon (?P<ADDON>[%(NUM)s]+)" % substitutions, re.MULTILINE)
     re_Rebuyin = re.compile(r"%(PLYR)s  ?\[ME\] : Rebuyin (?P<REBUY>[%(NUM)s]+)" % substitutions, re.MULTILINE)
     re_Ranking = re.compile(r"%(PLYR)s  ?\[ME\] : Ranking (?P<RANK>[%(NUM)s]+)" % substitutions, re.MULTILINE)
@@ -109,10 +109,10 @@ class BovadaSummary(TourneySummary):
                         raise FpdbParseError
                     self.currency = self.buyinCurrency
 
-                    info['BIAMT'] = info['BIAMT'].strip(u'$')
+                    info['BIAMT'] = info['BIAMT'].strip('$')
                     
                     if info['BIRAKE']:
-                        info['BIRAKE'] = info['BIRAKE'].strip(u'$')
+                        info['BIRAKE'] = info['BIRAKE'].strip('$')
                     else:
                         info['BIRAKE'] = '0'
 

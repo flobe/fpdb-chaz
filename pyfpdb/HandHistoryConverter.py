@@ -142,11 +142,11 @@ HandHistoryConverter: '%(sitename)s'
                 try:
                     self.processedHands.append(self.processHand(handText))
                     lastParsed = 'stored'
-                except FpdbHandPartial, e:
+                except FpdbHandPartial as e:
                     self.numPartial += 1
                     lastParsed = 'partial'
                     log.debug("%s" % e)
-                except FpdbHandSkipped, e:
+                except FpdbHandSkipped as e:
                     self.numSkipped += 1
                     lastParsed = 'skipped'
                 except FpdbParseError:
@@ -187,7 +187,7 @@ HandHistoryConverter: '%(sitename)s'
         self.index -= (lenobs - len(self.obs))
         self.obs = self.obs.lstrip()
         lenobs = len(self.obs)
-        self.obs = self.obs.replace('\r\n', '\n').replace(u'\xa0', u' ')
+        self.obs = self.obs.replace('\r\n', '\n').replace('\xa0', ' ')
         if lenobs != len(self.obs):
             self.isCarraige = True
         # maybe archive params should be one archive param, then call method in specific converter?
@@ -221,7 +221,7 @@ HandHistoryConverter: '%(sitename)s'
         if self.isPartial(handText):
             raise FpdbHandPartial(_("Could not identify as a %s hand") % self.sitename)
         if self.copyGameHeader:
-            gametype = self.parseHeader(handText, self.whole_file.replace('\r\n', '\n').replace(u'\xa0', u' '))
+            gametype = self.parseHeader(handText, self.whole_file.replace('\r\n', '\n').replace('\xa0', ' '))
         else:
             gametype = self.determineGameType(handText)
         hand = None
@@ -436,7 +436,7 @@ or None if we fail to get the info """
             sane = True
 
         if self.in_path != '-' and self.out_path == self.in_path:
-            print(_("Output and input files are the same, check config."))
+            print((_("Output and input files are the same, check config.")))
             sane = False
 
         return sane
@@ -674,7 +674,7 @@ or None if we fail to get the info """
         if not money:
             return money
         money = money.replace(' ', '')
-        money = money.replace(u'\xa0', u'')
+        money = money.replace('\xa0', '')
         if 'K' in money:
             money = money.replace('K', '000')
         if 'M' in money:

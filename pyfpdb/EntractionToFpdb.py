@@ -34,10 +34,10 @@ class Entraction(HandHistoryConverter):
     sym = {'USD': "\$", 'CAD': "\$", 'T$': "", "EUR": "\xe2\x82\xac", "GBP": "\xa3", "play": ""}
     substitutions = {
                      'LEGAL_ISO' : "EUR|Fun|",
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|\£|", # legal currency symbols - Euro(cp1252, utf-8)
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|\£|", # legal currency symbols - Euro(cp1252, utf-8)
                            'PLYR': r'(?P<PNAME>.+?)',
-                            'CUR': u"(\$|\xe2\x82\xac|\u20ac|)",
-                            'NUM': u".,\d",
+                            'CUR': "(\$|\xe2\x82\xac|\u20ac|)",
+                            'NUM': ".,\d",
                     }
                     
     Lim_Blinds = {      '0.04': ('0.01', '0.02'),
@@ -68,7 +68,7 @@ class Entraction(HandHistoryConverter):
                }
 
     # Static regexes
-    re_GameInfo     = re.compile(u"""
+    re_GameInfo     = re.compile("""
           \s(?P<HID>[0-9]+)\s-\s
           (?P<GAME>Texas\sHold\'em|Omaha\sHigh|5-Card\sOmaha\sHigh)\s
           (?P<LIMIT>No\sLimit|Pot\sLimit|Fixed\sLimit)\s
@@ -79,7 +79,7 @@ class Entraction(HandHistoryConverter):
           \-\sTable\s\"(?P<TABLE>.+?)(\s(?P<TOURNO>\d+)\s(?P<TABLENO>\d+))?\"
         """ % substitutions, re.MULTILINE|re.VERBOSE)
 
-    re_PlayerInfo   = re.compile(u"""
+    re_PlayerInfo   = re.compile("""
           ^(?P<PNAME>.*)\s
           \((%(LEGAL_ISO)s)?\s?(?P<CASH>[%(NUM)s]+)\s
           in\sseat\s(?P<SEAT>[0-9]+)\)"""
@@ -90,7 +90,7 @@ class Entraction(HandHistoryConverter):
           Table\s"(?P<TABLE>(?P<BUYIN>(?P<BIAMT>[%(LS)s%(NUM)s]+)?\+?(?P<BIRAKE>[%(NUM)s]+)?)?.+?)(\s(?P<TOURNO>\d+)\s(?P<TABLENO>\d+))?\"
         """ % substitutions, re.MULTILINE|re.VERBOSE)
 
-    re_Identify     = re.compile(u'Game\s\#\s\d+\s\-\s')
+    re_Identify     = re.compile('Game\s\#\s\d+\s\-\s')
     re_SplitHands   = re.compile(r"\n\n(?=Game\s#)")
     re_Button       = re.compile(r'^Dealer:\s+(?P<PNAME>.*)$', re.MULTILINE)
     re_Board        = re.compile(r"^(?P<CARDS>.+)$", re.MULTILINE)
@@ -207,9 +207,9 @@ class Entraction(HandHistoryConverter):
                     else:
                         if info[key].find("$")!=-1:
                             hand.buyinCurrency="USD"
-                        elif info[key].find(u"£")!=-1:
+                        elif info[key].find("£")!=-1:
                             hand.buyinCurrency="GBP"
-                        elif info[key].find(u"€")!=-1:
+                        elif info[key].find("€")!=-1:
                             hand.buyinCurrency="EUR"
                         elif re.match("^[0-9+]*$", info[key]):
                             hand.buyinCurrency="play"
@@ -218,8 +218,8 @@ class Entraction(HandHistoryConverter):
                             log.error(_("EntractionToFpdb.readHandInfo: Failed to detect currency.") + " Hand ID: %s: '%s'" % (hand.handid, info[key]))
                             raise FpdbParseError
 
-                        info['BIAMT'] = self.clearMoneyString(info['BIAMT'].strip(u'$€£'))
-                        info['BIRAKE'] = self.clearMoneyString(info['BIRAKE'].strip(u'$€£'))
+                        info['BIAMT'] = self.clearMoneyString(info['BIAMT'].strip('$€£'))
+                        info['BIRAKE'] = self.clearMoneyString(info['BIRAKE'].strip('$€£'))
                         hand.buyin = int(100*Decimal(info['BIAMT']))
                         hand.fee = int(100*Decimal(info['BIRAKE']))
             if key == 'TABLE':
@@ -295,7 +295,7 @@ class Entraction(HandHistoryConverter):
 #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
 #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
                     hand.hero = [p[1] for p in hand.players if p[1].lower()==found.group('PNAME').lower()][0]

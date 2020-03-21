@@ -54,7 +54,7 @@ class TourneySummary(object):
 #    Class Variables
     UPS = {'a':'A', 't':'T', 'j':'J', 'q':'Q', 'k':'K', 'S':'s', 'C':'c', 'H':'h', 'D':'d'}     # SAL- TO KEEP ??
     LCS = {'H':'h', 'D':'d', 'C':'c', 'S':'s'}                                                  # SAL- TO KEEP ??
-    SYMBOL = {'USD': '$', 'EUR': u'$', 'T$': '', 'play': ''}
+    SYMBOL = {'USD': '$', 'EUR': '$', 'T$': '', 'play': ''}
     MS = {'horse' : 'HORSE', '8game' : '8-Game', 'hose'  : 'HOSE', 'ha': 'HA'}
     SITEIDS = {'Fulltilt':1, 'Full Tilt Poker':1, 'PokerStars':2, 'Everleaf':3, 'Boss':4, 'OnGame':5,
                'UltimateBet':6, 'Betfair':7, 'Absolute':8, 'PartyPoker':9, 'PacificPoker':10,
@@ -228,7 +228,7 @@ class TourneySummary(object):
     @staticmethod
     def clearMoneyString(money):
         "Renders 'numbers' like '1 200' and '2,000'"
-        money = money.strip(u'€&euro;\u20ac$ ')
+        money = money.strip('€&euro;\u20ac$ ')
         return HandHistoryConverter.clearMoneyString(money)
     
     def insertOrUpdate(self, printtest=False):
@@ -243,7 +243,7 @@ class TourneySummary(object):
         # Note: If the TourneyNo could be a unique id .... this would really be a relief to deal with matrix matches ==> Ask on the IRC / Ask Fulltilt ??
         self.db.set_printdata(printtest)
         
-        self.playerIds = self.db.getSqlPlayerIDs(self.players.keys(), self.siteId, self.hero)
+        self.playerIds = self.db.getSqlPlayerIDs(list(self.players.keys()), self.siteId, self.hero)
         #for player in self.players:
         #    id=self.db.get_player_id(self.config, self.siteName, player)
         #    if not id:
@@ -313,7 +313,7 @@ winnings    (int) the money the player ended the tourney with (can be 0, or -1 i
     #end def addPlayer
 
     def writeSummary(self, fh=sys.__stdout__):
-        print >> fh, "Override me"
+        print("Override me", file=fh)
 
     def printSummary(self):
         self.writeSummary(sys.stdout)
@@ -323,21 +323,21 @@ winnings    (int) the money the player ended the tourney with (can be 0, or -1 i
         wb = xlrd.open_workbook(filenameXLS)
         sh = wb.sheet_by_index(0)
         summaryTexts, rows, header, keys, entries = [], [], None, None, {}
-        for rownum in xrange(sh.nrows):
+        for rownum in range(sh.nrows):
             if rownum==0:
                 header = sh.row_values(rownum)[0]
             elif tourNoField in sh.row_values(rownum):
-                keys = [unicode(c).encode('utf-8') for c in sh.row_values(rownum)]
+                keys = [str(c).encode('utf-8') for c in sh.row_values(rownum)]
             elif keys!=None:
-                rows.append([unicode(c).encode('utf-8') for c in sh.row_values(rownum)])
+                rows.append([str(c).encode('utf-8') for c in sh.row_values(rownum)])
         for row in rows:
-            data = dict(zip(keys, row))
+            data = dict(list(zip(keys, row)))
             data['header'] = header
             if len(data[tourNoField])>0:
                 if entries.get(data[tourNoField])==None:
                     entries[data[tourNoField]] = []
                 entries[data[tourNoField]].append(data)
-        for k, item in entries.iteritems():
+        for k, item in entries.items():
             summaryTexts.append(item)
         return summaryTexts
 
@@ -350,9 +350,9 @@ winnings    (int) the money the player ended the tourney with (can be 0, or -1 i
                 whole_file = in_fh.read()
                 in_fh.close()
                 break
-            except UnicodeDecodeError, e:
+            except UnicodeDecodeError as e:
                 log.warning("TS.readFile: '%s' : '%s'" % (filename, e))
-            except UnicodeError, e:
+            except UnicodeError as e:
                 log.warning("TS.readFile: '%s' : '%s'" % (filename, e))
 
         return whole_file

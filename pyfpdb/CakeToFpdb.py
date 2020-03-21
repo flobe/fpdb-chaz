@@ -36,10 +36,10 @@ class Cake(HandHistoryConverter):
     sym = {'USD': "\$", 'CAD': "\$", 'T$': "", "EUR": "\xe2\x82\xac", "GBP": "\xa3", "play": ""}
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",      # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|", # legal currency symbols - Euro(cp1252, utf-8)
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|", # legal currency symbols - Euro(cp1252, utf-8)
                            'PLYR': r'(?P<PNAME>.+?)',
-                            'CUR': u"(\$|\xe2\x82\xac|\u20ac|)",
-                            'NUM' :u".,\d\xa0",
+                            'CUR': "(\$|\xe2\x82\xac|\u20ac|)",
+                            'NUM' :".,\d\xa0",
                     }
                     
     # translations from captured groups to fpdb info strings
@@ -72,10 +72,10 @@ class Cake(HandHistoryConverter):
                           'Omaha Hi/Lo' : ('hold','omahahilo'),
                             'OmahaHiLo' : ('hold','omahahilo'),
                }
-    currencies = { u'€':'EUR', '$':'USD', '':'T$' }
+    currencies = { '€':'EUR', '$':'USD', '':'T$' }
 
     # Static regexes
-    re_GameInfo     = re.compile(u"""
+    re_GameInfo     = re.compile("""
           Hand\#(?P<HID>[A-Z0-9]+)\s+\-\s+
           (?P<TABLE>(?P<BUYIN1>(?P<BIAMT1>(%(LS)s)[%(NUM)s]+)\sNLH\s(?P<MAX1>\d+)\smax)?.+?)\s(\((Turbo,\s)?(?P<MAX>\d+)\-[Mm]ax\)\s)?((?P<TOURNO>T\d+)|\d+)\s
           (\-\-\s(TICKET|CASH|TICKETCASH)\s\-\-\s(?P<BUYIN>(?P<BIAMT>(%(LS)s)[%(NUM)s]+)\s\+\s(?P<BIRAKE>(%(LS)s)[%(NUM)s]+))\s\-\-\s(?P<TMAX>\d+)\sMax\s)?
@@ -89,7 +89,7 @@ class Cake(HandHistoryConverter):
           (?P<DATETIME>.*$)
           """ % substitutions, re.MULTILINE|re.VERBOSE)
 
-    re_PlayerInfo   = re.compile(u"""
+    re_PlayerInfo   = re.compile("""
           ^Seat\s(?P<SEAT>[0-9]+):\s
           (?P<PNAME>.+?)\s
           \((%(LS)s)?(?P<CASH>[%(NUM)s]+)\sin\schips\)
@@ -97,7 +97,7 @@ class Cake(HandHistoryConverter):
           re.MULTILINE|re.VERBOSE)
 
     re_Trim         = re.compile("(Hand\#)")
-    re_Identify     = re.compile(u'Hand\#[A-Z0-9]+\s\-\s')
+    re_Identify     = re.compile('Hand\#[A-Z0-9]+\s\-\s')
     re_SplitHands   = re.compile('\n\n+')
     re_Button       = re.compile('Dealer: Seat (?P<BUTTON>\d+)', re.MULTILINE)
     re_Board        = re.compile(r"\[(?P<CARDS>.+)\]")
@@ -237,9 +237,9 @@ class Cake(HandHistoryConverter):
                 if hand.tourNo!=None:
                     if info[key].find("$")!=-1:
                         hand.buyinCurrency="USD"
-                    elif info[key].find(u"£")!=-1:
+                    elif info[key].find("£")!=-1:
                         hand.buyinCurrency="GBP"
-                    elif info[key].find(u"€")!=-1:
+                    elif info[key].find("€")!=-1:
                         hand.buyinCurrency="EUR"
                     elif re.match("^[0-9+]*$", info[key]):
                         hand.buyinCurrency="play"
@@ -249,12 +249,12 @@ class Cake(HandHistoryConverter):
                         raise FpdbParseError
                     
                     if key == 'BUYIN1':
-                        info['BIAMT1']  = self.clearMoneyString(info['BIAMT1'].strip(u'$€£'))
+                        info['BIAMT1']  = self.clearMoneyString(info['BIAMT1'].strip('$€£'))
                         hand.buyin = int(100*Decimal(info['BIAMT1']))
                         hand.fee = 0
                     else:
-                        info['BIAMT']  = self.clearMoneyString(info['BIAMT'].strip(u'$€£'))
-                        info['BIRAKE'] = self.clearMoneyString(info['BIRAKE'].strip(u'$€£'))
+                        info['BIAMT']  = self.clearMoneyString(info['BIAMT'].strip('$€£'))
+                        info['BIRAKE'] = self.clearMoneyString(info['BIRAKE'].strip('$€£'))
                         hand.buyin = int(100*Decimal(info['BIAMT']))
                         hand.fee = int(100*Decimal(info['BIRAKE']))
                 
@@ -333,7 +333,7 @@ class Cake(HandHistoryConverter):
 
     def readHoleCards(self, hand):
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
                     hand.hero = found.group('PNAME')
@@ -388,7 +388,7 @@ class Cake(HandHistoryConverter):
                     mucked = True
                     cards = [c.strip() for c in cards.split(',')] # needs to be a list, not a set--stud needs the order
 
-                print "DEBUG: hand.addShownCards(%s, %s, %s, %s)" %(cards, m.group('PNAME'), shown, mucked)
+                print("DEBUG: hand.addShownCards(%s, %s, %s, %s)" %(cards, m.group('PNAME'), shown, mucked))
                 try:
                     hand.checkPlayerExists(m.group('PNAME'))
                     player = m.group('PNAME')

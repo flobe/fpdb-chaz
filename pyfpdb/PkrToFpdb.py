@@ -35,11 +35,11 @@ class Pkr(HandHistoryConverter):
     siteId   = 13 # Needs to match id entry in Sites database
 
     mixes = { 'HORSE': 'horse', '8-Game': '8game', 'HOSE': 'hose'} # Legal mixed games
-    sym = {'USD': "\$", 'T$': "", "EUR": u"\u20ac", "GBP": u"\£"} # ADD Euro, Sterling, etc HERE
+    sym = {'USD': "\$", 'T$': "", "EUR": "\u20ac", "GBP": "\£"} # ADD Euro, Sterling, etc HERE
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP",    # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|\£|", # legal currency symbols - Euro(cp1252, utf-8)
-                           'NUM' : u".,\d",
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|\£|", # legal currency symbols - Euro(cp1252, utf-8)
+                           'NUM' : ".,\d",
                     }
 
     limits = { 'NO LIMIT':'nl', 'POT LIMIT':'pl', 'LIMIT':'fl' }
@@ -49,7 +49,7 @@ class Pkr(HandHistoryConverter):
                           'OMAHA HI/LO' : ('hold','omahahilo'),
                      'FIXME5 Card Draw' : ('draw','fivedraw')
                }
-    currencies = { u'€':'EUR', '$':'USD', '':'T$', u'£':'GBP' }
+    currencies = { '€':'EUR', '$':'USD', '':'T$', '£':'GBP' }
     
     months = { 'January':1, 'Jan':1, 'February':2, 'Feb':2, 'March':3, 'Mar':3,
                  'April':4, 'Apr':4, 'May':5, 'May':5, 'June':6, 'Jun':6,
@@ -57,7 +57,7 @@ class Pkr(HandHistoryConverter):
                'October':10, 'Oct':10, 'November':11, 'Nov':11, 'December':12, 'Dec':12}
 
     # Static regexes
-    re_GameInfo     = re.compile(u"""
+    re_GameInfo     = re.compile("""
           Table\s\#\d+\s\-\s((Tournament|STT)\s\#\s?(?P<TOURNO>\d+)(\sTable\s\#)?)?(?P<TABLE>.+?)?\s
           Starting\sHand\s\#(?P<HID>[0-9]+)\s
           Start\stime\sof\shand:\s(?P<DATETIME>.*)\s
@@ -71,7 +71,7 @@ class Pkr(HandHistoryConverter):
           (?P<BB>[%(NUM)s]+)
           """ % substitutions, re.MULTILINE|re.VERBOSE)
 
-    re_PlayerInfo   = re.compile(u"""
+    re_PlayerInfo   = re.compile("""
               ^Seat\s(?P<SEAT>[0-9]+):\s
               (?P<PNAME>.+?)
               (\s\(bounty\svalue\s(%(LS)s)?[%(NUM)s]+,\sbounty\swon\s(%(LS)s)?[%(NUM)s]+\))?\s-\s
@@ -84,13 +84,13 @@ class Pkr(HandHistoryConverter):
           Moving\sButton\sto\sseat\s(?P<BUTTON>\d+)\s""", 
           re.MULTILINE|re.VERBOSE)
 
-    re_Identify     = re.compile(u'Starting\sHand\s\#\d+')
+    re_Identify     = re.compile('Starting\sHand\s\#\d+')
     re_SplitHands   = re.compile('\n\n+')
     re_TailSplitHands   = re.compile('(\n\n\n+)')
     re_Button       = re.compile('Seat #(?P<BUTTON>\d+) is the button', re.MULTILINE)
     re_Board        = re.compile(r"(?P<CARDS>\[.+\])")
     re_Cards        = re.compile(r"\[(?P<CARD>.+?)\]")
-    re_Partial      = re.compile(u'Table\s\#\d+\s\-\s')
+    re_Partial      = re.compile('Table\s\#\d+\s\-\s')
 #        self.re_setHandInfoRegex('.*#(?P<HID>[0-9]+): Table (?P<TABLE>[ a-zA-Z]+) - \$?(?P<SB>[.0-9]+)/\$?(?P<BB>[.0-9]+) - (?P<GAMETYPE>.*) - (?P<HR>[0-9]+):(?P<MIN>[0-9]+) ET - (?P<YEAR>[0-9]+)/(?P<MON>[0-9]+)/(?P<DAY>[0-9]+)Table (?P<TABLE>[ a-zA-Z]+)\nSeat (?P<BUTTON>[0-9]+)')    
 
     re_DateTime     = re.compile("""(?P<D>[0-9]{2}) (?P<M>\w+) (?P<Y>[0-9]{4}) (?P<H>[0-9]+):(?P<MIN>[0-9]+):(?P<S>[0-9]+)""", re.MULTILINE)
@@ -101,7 +101,7 @@ class Pkr(HandHistoryConverter):
             # we need to recompile the player regexs.
             self.compiledPlayers = players
             player_re = "(?P<PNAME>" + "|".join(map(re.escape, players)) + ")"
-            subst = {'PLYR': player_re, 'CUR': self.sym[hand.gametype['currency']], 'NUM' : u".,\d",}
+            subst = {'PLYR': player_re, 'CUR': self.sym[hand.gametype['currency']], 'NUM' : ".,\d",}
             self.re_PostSB    = re.compile(r"^%(PLYR)s posts small blind \(%(CUR)s(?P<SB>[%(NUM)s]+)\)" %  subst, re.MULTILINE)
             # FIXME: Sionel posts $0.04 is a second big blind in a different format.
             self.re_PostBB    = re.compile(r"^%(PLYR)s posts big blind \(%(CUR)s(?P<BB>[%(NUM)s]+)\)" %  subst, re.MULTILINE)
@@ -232,7 +232,7 @@ class Pkr(HandHistoryConverter):
                      # The hash is to cache the player names, and ignore
                      # The second round
         for a in m:
-            if players.has_key(a.group('PNAME')):
+            if a.group('PNAME') in players:
                 pass # Ignore
             else:
                 #print "DEBUG: addPlayer(%s, %s, %s)" % (a.group('SEAT'), a.group('PNAME'), a.group('CASH'))
@@ -280,7 +280,7 @@ class Pkr(HandHistoryConverter):
             hand.addBlind(a.group('PNAME'), 'big blind', self.clearMoneyString(a.group('BB')))
         for a in self.re_Post.finditer(hand.handText):
             bb = Decimal(self.clearMoneyString(a.group('BB')))
-            subst = {'PLYR': "(?P<PNAME>" + re.escape(a.group('PNAME')) + ")", 'CUR': self.sym[hand.gametype['currency']], 'NUM' : u".,\d"}
+            subst = {'PLYR': "(?P<PNAME>" + re.escape(a.group('PNAME')) + ")", 'CUR': self.sym[hand.gametype['currency']], 'NUM' : ".,\d"}
             if not re.search(r"^%(PLYR)s posts %(CUR)s(?P<SB>[%(NUM)s]+) dead$" %  subst, hand.handText, re.MULTILINE):
                 hand.addBlind(a.group('PNAME'), 'big blind', self.clearMoneyString(a.group('BB')))
             elif (bb==0):
@@ -292,7 +292,7 @@ class Pkr(HandHistoryConverter):
 #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
 #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
 #                    if m == None:

@@ -41,7 +41,7 @@ def splitPokerStarsSummaries(summaryText): #TODO: this needs to go to PSS.py
     splitSummaries = re.split(re_SplitTourneys, summaryText)
 
     if len(splitSummaries) <= 1:
-        print (_("DEBUG:") + " " + _("Could not split tourneys"))
+        print((_("DEBUG:") + " " + _("Could not split tourneys")))
 
     return splitSummaries
 
@@ -50,7 +50,7 @@ def splitFullTiltSummaries(summaryText):#TODO: this needs to go to FTPS.py
     splitSummaries = re.split(re_SplitTourneys, summaryText)
 
     if len(splitSummaries) <= 1:
-		print(_("DEBUG:") + " " + _("Could not split tourneys"))
+		print((_("DEBUG:") + " " + _("Could not split tourneys")))
 
     return splitSummaries
 
@@ -80,7 +80,7 @@ def run(config, db):
                 raise error #TODO: show error message
             neededMessages.append(("PS", messageNumber))
 
-        print _("Found %s eMails to fetch") %(len(neededMessages))
+        print(_("Found %s eMails to fetch") %(len(neededMessages)))
 
         if (len(neededMessages)==0):
             raise error #TODO: show error message
@@ -100,15 +100,15 @@ def run(config, db):
        # finally:
         #    pass
         server.logout()
-        print _("Finished downloading emails.")
+        print(_("Finished downloading emails."))
 
         errors = 0
         if len(email_bodies) > 0:
             errors = importSummaries(db, config, email_bodies, options = None)
         else:
-            print _("No Tournament summaries found.")
+            print(_("No Tournament summaries found."))
 
-        print(_("Errors:"), errors)
+        print((_("Errors:"), errors))
 
 def readFile(filename, options):
     codepage = ["utf8"]
@@ -147,16 +147,16 @@ def importSummaries(db, config, summaries, options = None):
         elif options.hhc == "Full Tilt Poker":
             summaryTexts=(splitFullTiltSummaries(summaryText))
 
-        print "Found %s summaries in email" %(len(summaryTexts))
+        print("Found %s summaries in email" %(len(summaryTexts)))
         for j, summaryText in enumerate(summaryTexts, start=1):
             try:
                 if options == None or options.hhc == "PokerStars":
-                    PokerStarsSummary.PokerStarsSummary(db=db, config=config, siteName=u"PokerStars", summaryText=summaryText, builtFrom = "IMAP")
+                    PokerStarsSummary.PokerStarsSummary(db=db, config=config, siteName="PokerStars", summaryText=summaryText, builtFrom = "IMAP")
                 elif options.hhc == "Full Tilt Poker":
-                    FullTiltPokerSummary.FullTiltPokerSummary(db=db, config=config, siteName=u"Fulltilt", summaryText=summaryText, builtFrom = "IMAP")
-            except FpdbParseError, e:
+                    FullTiltPokerSummary.FullTiltPokerSummary(db=db, config=config, siteName="Fulltilt", summaryText=summaryText, builtFrom = "IMAP")
+            except FpdbParseError as e:
                 errors += 1
-            print _("Finished importing %s/%s tournament summaries") %(j, len(summaryTexts))
+            print(_("Finished importing %s/%s tournament summaries") %(j, len(summaryTexts)))
 
     return errors
 
@@ -169,11 +169,11 @@ def main(argv=None):
 
     if options.usage == True:
         #Print usage examples and exit
-        print _("USAGE:")
+        print(_("USAGE:"))
         sys.exit(0)
 
     if options.hhc == "PokerStarsToFpdb":
-        print _("Need to define a converter")
+        print(_("Need to define a converter"))
         exit(0)
 
     Configuration.set_logfile("fpdb-log.txt")

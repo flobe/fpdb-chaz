@@ -45,10 +45,10 @@ class Winning(HandHistoryConverter):
     } 
     substitutions = {
         'LEGAL_ISO' : "USD|TB|CP",      # legal ISO currency codes
-        'LS' : u"\$|", # legal currency symbols - Euro(cp1252, utf-8)
+        'LS' : "\$|", # legal currency symbols - Euro(cp1252, utf-8)
         'PLYR': r'(?P<PNAME>.+?)',
-        'NUM' :u".,\dK",
-        'CUR': u"(\$|)",
+        'NUM' :".,\dK",
+        'CUR': "(\$|)",
         'BRKTS': r'(\(button\)\s|\(small\sblind\)\s|\(big\sblind\)\s|\(button\)\s\(small\sblind\)\s|\(button\)\s\(big\sblind\)\s)?',
     }
     games1 = {# base, category
@@ -135,7 +135,7 @@ class Winning(HandHistoryConverter):
     }
     currencies = { '$':'USD', '':'T$'}
     
-    re_GameInfo1 = re.compile(u"""
+    re_GameInfo1 = re.compile("""
         Game\sID:\s(?P<HID>\d+)\s
         (?P<SB>[%(NUM)s]+)/(?P<BB>[%(NUM)s]+)\s
         (?P<TABLE>.+?)?\s
@@ -150,7 +150,7 @@ class Winning(HandHistoryConverter):
     #Game Hand #80586589 - Tournament #11182752 - Holdem(No Limit) - Level 15 (250.00/500.00)- 2019/07/21 17:44:50 UTC
     #Game Hand #82980175 - Tournament #11212445 - Omaha H/L(Pot Limit) - Level 1 (250.00/500.00)- 2019/07/25 02:31:33 UTC
     
-    re_GameInfo2 = re.compile(u"""
+    re_GameInfo2 = re.compile("""
           (Game\s)?Hand\s\#(?P<HID>[0-9]+)\s\-\s
           (
           (?P<TOUR>Tournament\s\#(?P<TOURNO>\d+)\s\-\s)                # open paren of tournament info
@@ -168,7 +168,7 @@ class Winning(HandHistoryConverter):
         """ % substitutions, re.MULTILINE|re.VERBOSE)
     
     #Seat 6: puccini (5.34).
-    re_PlayerInfo1 = re.compile(u"""
+    re_PlayerInfo1 = re.compile("""
         ^Seat\s(?P<SEAT>[0-9]+):\s
         (?P<PNAME>.*)\s
         \((?P<CASH>[%(NUM)s]+)\)
@@ -177,7 +177,7 @@ class Winning(HandHistoryConverter):
         re.MULTILINE|re.VERBOSE
     )
     
-    re_PlayerInfo2 = re.compile(u"""
+    re_PlayerInfo2 = re.compile("""
         ^\s?Seat\s(?P<SEAT>[0-9]+):\s
         (?P<PNAME>.*)\s
         \((%(LS)s)?(?P<CASH>[,.0-9]+)
@@ -203,7 +203,7 @@ class Winning(HandHistoryConverter):
     #$25 GTD - On Demand, Table 1
     #$5 Regular 9-Max, Table 1 (Hold'em)
         
-    re_Table1 = re.compile(u"""
+    re_Table1 = re.compile("""
         ^(?P<CURRENCY>[%(LS)s]|)?(?P<BUYIN>[%(NUM)s]+)\s
         ((?P<GAME>(Six\sPlus\s)?Holdem|PLO|PLO8|Omaha\sHi/Lo|Omaha|PL\sOmaha|PL\sOmaha\sHi/Lo|PLO\sHi/Lo)\s?)?
         ((?P<SPECIAL>(GTD|Freeroll|FREEBUY|Freebuy))\s?)?
@@ -229,15 +229,15 @@ class Winning(HandHistoryConverter):
           (Seat\s\#(?P<BUTTON>\d+)\sis\sthe\sbutton)?""", 
           re.MULTILINE|re.VERBOSE)
     
-    re_TourneyName1 = re.compile(u"(?P<TOURNAME>.*),\sTable\s\d+")
-    re_TourneyName2 = re.compile(u"TN\-(?P<TOURNAME>.+?)\sGAMETYPE")
-    re_GTD          = re.compile(u"(?P<GTD>[%(NUM)s]+)\sGTD" % substitutions)
+    re_TourneyName1 = re.compile("(?P<TOURNAME>.*),\sTable\s\d+")
+    re_TourneyName2 = re.compile("TN\-(?P<TOURNAME>.+?)\sGAMETYPE")
+    re_GTD          = re.compile("(?P<GTD>[%(NUM)s]+)\sGTD" % substitutions)
     re_buyinType    = re.compile("\((?P<BUYINTYPE>CAP|Short)\)", re.MULTILINE)
     re_buyin        = re.compile("%(CUR)s(?P<BUYIN>[,.0-9]+)" %  substitutions, re.MULTILINE)
     re_Step         = re.compile("\sStep\s(?P<STEPNO>\d+)")
 
-    re_Identify     = re.compile(u'Game\sID:\s\d+|Hand\s\#\d+\s\-\s')
-    re_Identify_Old = re.compile(u'Game\sID:\s\d+')
+    re_Identify     = re.compile('Game\sID:\s\d+|Hand\s\#\d+\s\-\s')
+    re_Identify_Old = re.compile('Game\sID:\s\d+')
     re_SplitHands   = re.compile('\n\n')
     re_Button1      = re.compile('Seat (?P<BUTTON>\d+) is the button')
     re_Button2      = re.compile('Seat #(?P<BUTTON>\d+) is the button')
@@ -848,7 +848,7 @@ class Winning(HandHistoryConverter):
 #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
 #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 newcards = []
                 m = self.re_HeroCards1.finditer(hand.streets[street])
                 for found in m:
@@ -857,7 +857,7 @@ class Winning(HandHistoryConverter):
                 if hand.hero:
                     hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
 
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards1.finditer(hand.streets[street])
             players = {}
@@ -867,7 +867,7 @@ class Winning(HandHistoryConverter):
                     players[player] = []
                 players[player].append(found.group('CARD').replace("10", "T"))
             
-            for player, cards in players.iteritems():
+            for player, cards in players.items():
                 if street == 'THIRD': # hero in stud game
                     hand.dealt.add(player) # need this for stud??
                     if len(cards)==3:
@@ -887,7 +887,7 @@ class Winning(HandHistoryConverter):
 #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
 #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 newcards = []
                 m = self.re_HeroCards2.finditer(hand.streets[street])
                 for found in m:
@@ -896,7 +896,7 @@ class Winning(HandHistoryConverter):
                 if hand.hero:
                     hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
 
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards2.finditer(hand.streets[street])
             for found in m:
@@ -947,7 +947,7 @@ class Winning(HandHistoryConverter):
                 if action.group('BET') == None:
                     amount = str(hand.stacks[player])
                 else:
-                    amount = self.clearMoneyString(action.group('BET')).replace(u',', u'') #some sites have commas
+                    amount = self.clearMoneyString(action.group('BET')).replace(',', '') #some sites have commas
                 Ai = Decimal(amount)
                 Bp = hand.lastBet[street]
                 Bc = sum(hand.bets[street][player])

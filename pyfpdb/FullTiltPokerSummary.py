@@ -80,9 +80,9 @@ class FullTiltPokerSummary(TourneySummary):
 
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP|FTP",      # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|", # legal currency symbols - Euro(cp1252, utf-8)
-                           'TAB' : u"-\u2013'\s\da-zA-Z#_\.",      # legal characters for tablename
-                           'NUM' : u".,\dKMB",                    # legal characters in number format
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|", # legal currency symbols - Euro(cp1252, utf-8)
+                           'TAB' : "-\u2013'\s\da-zA-Z#_\.",      # legal characters for tablename
+                           'NUM' : ".,\dKMB",                    # legal characters in number format
                     }
     
     months = { 'January':1, 'Jan':1, 'February':2, 'Feb':2, 'March':3, 'Mar':3,
@@ -90,9 +90,9 @@ class FullTiltPokerSummary(TourneySummary):
                   'July':7, 'Jul':7, 'August':8, 'Aug':8, 'September':9, 'Sep':9,
                'October':10, 'Oct':10, 'November':11, 'Nov':11, 'December':12, 'Dec':12}
 
-    re_Identify = re.compile(u'Full\sTilt\sPoker\.fr\sTournament|Full\sTilt\sPoker\sTournament\sSummary')
+    re_Identify = re.compile('Full\sTilt\sPoker\.fr\sTournament|Full\sTilt\sPoker\sTournament\sSummary')
     re_TourNo = re.compile("\#(?P<TOURNO>[0-9]+),")
-    re_TourneyInfo = re.compile(u"""
+    re_TourneyInfo = re.compile("""
                         \s(?P<TOURNAMENT>.+?)\s(\((?P<TOURPAREN>.+)\)\s+)?
                         \((?P<TOURNO>[0-9]+)\)
                         (\s+)?(\sMatch\s(?P<MATCHNO>\d)\s)?
@@ -130,19 +130,19 @@ class FullTiltPokerSummary(TourneySummary):
                                          ((?P<GUARANTEE>Guar(antee)?))?)
                                     ''' % substitutions, re.MULTILINE|re.VERBOSE)
 
-    re_Currency = re.compile(u"""(?P<CURRENCY>[%(LS)s]|FPP|FTP|T\$|Play\sChips)""" % substitutions)
+    re_Currency = re.compile("""(?P<CURRENCY>[%(LS)s]|FPP|FTP|T\$|Play\sChips)""" % substitutions)
     re_Max      = re.compile("((?P<MAX>\d+)\sHanded)|(?P<HU>Heads\sUp)", re.MULTILINE)
     re_Stack    = re.compile("((?P<STACK>(Deep|Super))\sStack)", re.MULTILINE)
     re_NewToGame = re.compile("(?P<NEWTOGAME>New\sto\sthe\sGame)", re.MULTILINE)
     re_Speed    = re.compile("(?P<SPEED>(Turbo|Super\sTurbo|Escalator))", re.MULTILINE)
     re_Multi    = re.compile("(?P<MULTI>(Multi-Entry|Re-Entry))", re.MULTILINE)
     re_Chance   = re.compile("((?P<CHANCE>\d)x\sChance)", re.MULTILINE)
-    re_Player = re.compile(u"""(?P<RANK>[\d]+):\s(?P<NAME>[^,\r\n]{2,15})(,\s(?P<CURRENCY>[%(LS)s])?(?P<WINNINGS>[%(NUM)s]+)(\s(?P<CURRENCY1>FTP|T\$|Play\sChips))?)?(,\s(?P<TICKET>Step\s(?P<LEVEL>\d)\sTicket))?""" % substitutions)
-    re_Finished = re.compile(u"""(?P<NAME>[^,\r\n]{2,15}) finished in (?P<RANK>[\d]+)\S\S place""")
+    re_Player = re.compile("""(?P<RANK>[\d]+):\s(?P<NAME>[^,\r\n]{2,15})(,\s(?P<CURRENCY>[%(LS)s])?(?P<WINNINGS>[%(NUM)s]+)(\s(?P<CURRENCY1>FTP|T\$|Play\sChips))?)?(,\s(?P<TICKET>Step\s(?P<LEVEL>\d)\sTicket))?""" % substitutions)
+    re_Finished = re.compile("""(?P<NAME>[^,\r\n]{2,15}) finished in (?P<RANK>[\d]+)\S\S place""")
     #19-Aug-2013 15:32
     re_HeroXLS = re.compile(r'Player\sTournament\sReport\sfor\s(?P<NAME>.*?)\s\(.*\)') 
     re_DateTimeXLS = re.compile("(?P<D>[0-9]{2})\-(?P<M>\w+)\-(?P<Y>[0-9]{4})\s(?P<H>[0-9]+):(?P<MIN>[0-9]+)")
-    re_GameXLS = re.compile(u"""(?P<GAME>Hold\'?em|Irish|Courchevel\sHi|Razz|RAZZ|5(-|\s)Card\sStud(\sHi)?|7(\sCard)?\sStud|7(\sCard)?\sStud\sHi/Lo|Stud\sH/L|Stud\sHi|Omaha|((5|6)\sCard\s)?Omaha\sHi|Omaha\sHi/Lo|Omaha\sH/L|2\-7\sSingle\sDraw|Badugi|Triple\sDraw\s2\-7\sLowball|2\-7\sTriple\sDraw|5\sCard\sDraw|\d+\-Game(\sMixed)?|HORSE|HA|HEROS|HO|HOE|HORSE|HOSE|OA|OE|SE)
+    re_GameXLS = re.compile("""(?P<GAME>Hold\'?em|Irish|Courchevel\sHi|Razz|RAZZ|5(-|\s)Card\sStud(\sHi)?|7(\sCard)?\sStud|7(\sCard)?\sStud\sHi/Lo|Stud\sH/L|Stud\sHi|Omaha|((5|6)\sCard\s)?Omaha\sHi|Omaha\sHi/Lo|Omaha\sH/L|2\-7\sSingle\sDraw|Badugi|Triple\sDraw\s2\-7\sLowball|2\-7\sTriple\sDraw|5\sCard\sDraw|\d+\-Game(\sMixed)?|HORSE|HA|HEROS|HO|HOE|HORSE|HOSE|OA|OE|SE)
                                 (\-(?P<LIMIT>NL|PL|Fixed))?
                              """,re.VERBOSE|re.MULTILINE|re.DOTALL)
     re_BuyInXLS = re.compile("(?P<CURRENCY1>[%(LS)s])?(?P<BUYIN>[%(NUM)s]+)(\s(?P<CURRENCY2>(FTP|T\$|Play\sChips)))?(\s\+\s[%(LS)s]?(?P<FEE>[%(NUM)s]+)(\sFTP|\sT\$|\sPlay\sChips)?)?" % substitutions)
@@ -393,7 +393,7 @@ class FullTiltPokerSummary(TourneySummary):
         mg = m.groupdict()
         
         if mg['CURRENCY'] == "$":     self.buyinCurrency="USD"
-        elif mg['CURRENCY'] == u"€":  self.buyinCurrency="EUR"
+        elif mg['CURRENCY'] == "€":  self.buyinCurrency="EUR"
         elif mg['CURRENCY'] == "FPP": self.buyinCurrency="FTFP"
         elif mg['CURRENCY'] == "FTP": self.buyinCurrency="FTFP"
         elif mg['CURRENCY'] == "T$":  self.buyinCurrency="USD"
@@ -418,7 +418,7 @@ class FullTiltPokerSummary(TourneySummary):
                     winnings = int(100*Decimal(self.clearMoneyString(mg['WINNINGS'])))
                     if 'CURRENCY' in mg and mg['CURRENCY'] != None:
                         if mg['CURRENCY'] == "$":     self.currency="USD"
-                        elif mg['CURRENCY'] == u"€":  self.currency="EUR"
+                        elif mg['CURRENCY'] == "€":  self.currency="EUR"
                     elif 'CURRENCY1' in mg and mg['CURRENCY1'] != None:
                         if mg['CURRENCY1'] == "FPP": self.currency="FTFP"
                         elif mg['CURRENCY1'] == "FTP": self.currency="FTFP"
@@ -464,7 +464,7 @@ class FullTiltPokerSummary(TourneySummary):
                 
     def setCurrency(self, m, currency=None):
         if m.group('CURRENCY1') == "$":     currency="USD"
-        elif m.group('CURRENCY1') == u"€":  currency="EUR"
+        elif m.group('CURRENCY1') == "€":  currency="EUR"
         elif m.group('CURRENCY2') == "FPP": currency="FTFP"
         elif m.group('CURRENCY2') == "FTP": currency="FTFP"
         elif m.group('CURRENCY2') == "T$":  currency="USD"

@@ -147,7 +147,7 @@ class Hud:
         x_scale = 1.0 * self.table.width / self.layout.width
         y_scale = 1.0 * self.table.height / self.layout.height
         
-        for i in (range(1, self.max + 1)):
+        for i in (list(range(1, self.max + 1))):
             if self.layout.location[i]:
                 self.layout.location[i] = (
                 (int(self.layout.location[i][0] * x_scale)),

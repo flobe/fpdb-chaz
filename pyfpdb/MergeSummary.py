@@ -76,10 +76,10 @@ class MergeSummary(TourneySummary):
 
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",     # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|" # legal currency symbols
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|" # legal currency symbols
                     }
-    re_Identify   = re.compile(u"<title>Online\sPoker\sTournament\sDetails\s\-\sCarbonPoker</title>")
-    re_NotFound   = re.compile(u"Tournament not found")
+    re_Identify   = re.compile("<title>Online\sPoker\sTournament\sDetails\s\-\sCarbonPoker</title>")
+    re_NotFound   = re.compile("Tournament not found")
     re_GameTypeHH = re.compile(r'<description type="(?P<GAME>Holdem|Omaha|Omaha|Omaha\sH/L8|2\-7\sLowball|A\-5\sLowball|Badugi|5\-Draw\sw/Joker|5\-Draw|7\-Stud|7\-Stud\sH/L8|5\-Stud|Razz|HORSE|RASH|HA|HO|SHOE|HOSE|HAR)(?P<TYPE>\sTournament)?" stakes="(?P<LIMIT>[a-zA-Z ]+)(\s\(?\$?(?P<SB>[.0-9]+)?/?\$?(?P<BB>[.0-9]+)?(?P<blah>.*)\)?)?"(\sversion="\d+")?/>\s?', re.MULTILINE)
     re_HandInfoHH = re.compile(r'<game id="(?P<HID1>[0-9]+)-(?P<HID2>[0-9]+)" starttime="(?P<DATETIME>.+?)" numholecards="[0-9]+" gametype="[0-9]+" (multigametype="(?P<MULTIGAMETYPE>\d+)" )?(seats="(?P<SEATS>[0-9]+)" )?realmoney="(?P<REALMONEY>(true|false))" data="[0-9]+[|:](?P<TABLENAME>[^|:]+)[|:](?P<TDATA>[^|:]+)[|:]?.*>', re.MULTILINE)
     re_DateTimeHH = re.compile(r'(?P<Y>[0-9]{4})\/(?P<M>[0-9]{2})\/(?P<D>[0-9]{2})[\- ]+(?P<H>[0-9]+):(?P<MIN>[0-9]+):(?P<S>[0-9]+)', re.MULTILINE)
@@ -93,13 +93,13 @@ class MergeSummary(TourneySummary):
     re_HTMLAddons = re.compile("Addons\s+?</th>\s+?<td>(?P<ADDON>.+?)\s+?</td>")
     re_HTMLRebuy = re.compile("Rebuys\s+?</th>\s+?<td>(?P<REBUY>.+?)\s+?</td>")
     re_HTMLTourNo = re.compile("Game ID</th>\s+?<td>(?P<TOURNO>[0-9]+)-1</td>")
-    re_HTMLPlayer = re.compile(u"""<tr>(<td align="center">)?\s+?(?P<RANK>\d+)</td>\s+?<td>(?P<PNAME>.+?)</td>\s+?<td>(?P<WINNINGS>.+?)</td>\s+?</tr>""")
+    re_HTMLPlayer = re.compile("""<tr>(<td align="center">)?\s+?(?P<RANK>\d+)</td>\s+?<td>(?P<PNAME>.+?)</td>\s+?<td>(?P<WINNINGS>.+?)</td>\s+?</tr>""")
     #re_HTMLDetails = re.compile(u"""<p class="text">(?P<LABEL>.+?) : (?P<VALUE>.+?)</p>""")
-    re_HTMLPrizepool = re.compile(u"""(Freeroll|Total) Prizepool\s+?</th>\s+?<td>(?P<PRIZEPOOL>[0-9,.]+)\s+?</td>""")
+    re_HTMLPrizepool = re.compile("""(Freeroll|Total) Prizepool\s+?</th>\s+?<td>(?P<PRIZEPOOL>[0-9,.]+)\s+?</td>""")
     re_HTMLStartTime = re.compile("Start Time\s+?</th>\s+?<td>(?P<STARTTIME>.+?)\s+?</td>")
     re_HTMLDateTime = re.compile("\w+?\s+?(?P<D>\d+)\w+?\s+(?P<M>\w+)\s+(?P<Y>\d+),?\s+(?P<H>\d+):(?P<MIN>\d+):(?P<S>\d+)")
     
-    re_Ticket = re.compile(u""" / Ticket (?P<VALUE>[0-9.]+)&euro;""")
+    re_Ticket = re.compile(""" / Ticket (?P<VALUE>[0-9.]+)&euro;""")
 
     codepage = ["utf-8"]
 
@@ -140,7 +140,7 @@ class MergeSummary(TourneySummary):
                 handsDict[tourNo] = [handText]
             else:
                 hands.append(handText)
-        for tourNo, hands in handsDict.iteritems():
+        for tourNo, hands in handsDict.items():
             self.resetInfo()
             self.db.resetBulkCache()
             m = self.re_GameTypeHH.search(hands[0])
@@ -229,8 +229,8 @@ class MergeSummary(TourneySummary):
                         
                     if self.isDoubleOrNothing:
                         if handText==hands[-1]:
-                            won = [w for w in players.keys() if w not in out or w in won]
-                            out = [p for p in players.keys()]
+                            won = [w for w in list(players.keys()) if w not in out or w in won]
+                            out = [p for p in list(players.keys())]
                     i = 0
                     for n in out:
                         winnings = 0
@@ -334,7 +334,7 @@ class MergeSummary(TourneySummary):
                     self.tourneyName = m.group('NAME').strip()[:40]
                     if m.group('NAME').find("$")!=-1:
                         self.buyinCurrency="USD"
-                    elif m.group('NAME').find(u"€")!=-1:
+                    elif m.group('NAME').find("€")!=-1:
                         self.buyinCurrency="EUR"
                 m = self.re_HTMLPrizepool.search(str(p))
                 if m:
@@ -393,7 +393,7 @@ class MergeSummary(TourneySummary):
                     if m.group('WINNINGS') != None:
                         if m.group('WINNINGS').find("$")!=-1:
                             self.currency="USD"
-                        elif m.group('WINNINGS').find(u"€")!=-1:
+                        elif m.group('WINNINGS').find("€")!=-1:
                             self.currency="EUR"
                         winnings = int(100*self.convert_to_decimal(m.group('WINNINGS')))
                     self.addPlayer(rank, name, winnings, self.currency, rebuyCount, addOnCount, koCount)

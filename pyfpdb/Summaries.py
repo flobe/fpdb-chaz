@@ -60,7 +60,7 @@ for messageData in neededMessages:
         tourneys.append(PokerStarsSummaries.PokerStarsSummaries(bodyData))
 
 for tourney in tourneys:
-    print "tourney:",tourney
+    print("tourney:",tourney)
 
 server.close()
 server.logout()

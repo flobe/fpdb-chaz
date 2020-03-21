@@ -41,9 +41,9 @@ class PacificPoker(HandHistoryConverter):
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",     # legal ISO currency codes
                            'PLYR': r'(?P<PNAME>.+?)',
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|", # legal currency symbols - Euro(cp1252, utf-8)
-                           'NUM' : u".,\d\xa0",
-                           'CUR' : u"(\$|\xe2\x82\xac|\u20ac|)"
+                            'LS' : "\$|\xe2\x82\xac|\u20ac|", # legal currency symbols - Euro(cp1252, utf-8)
+                           'NUM' : ".,\d\xa0",
+                           'CUR' : "(\$|\xe2\x82\xac|\u20ac|)"
                     }
                     
     # translations from captured groups to fpdb info strings
@@ -79,10 +79,10 @@ class PacificPoker(HandHistoryConverter):
                               'OmahaHL' : ('hold','omahahilo')
                }
 
-    currencies = { u'€':'EUR', '$':'USD', '':'T$' }
+    currencies = { '€':'EUR', '$':'USD', '':'T$' }
 
     # Static regexes
-    re_GameInfo     = re.compile(u"""
+    re_GameInfo     = re.compile("""
           (\#Game\sNo\s:\s[0-9]+\\n)?
           \*\*\*\*\*?\s(Cassava|888poker|888)(\.[a-z]{2})?\s(?P<FAST>Snap\sPoker\s)?(BLAST\s)?Hand\sHistory\sfor\sGame\s(?P<HID>[0-9]+)\s\*\*\*\*\*\\n
           (?P<CURRENCY1>%(LS)s)?\s?(?P<SB>[%(NUM)s]+)\s?(?P<CURRENCY2>%(LS)s)?/(%(LS)s)?\s?(?P<BB>[%(NUM)s]+)\s?(%(LS)s)?\sBlinds\s
@@ -94,7 +94,7 @@ class PacificPoker(HandHistoryConverter):
           (Tournament\s\#(?P<TOURNO>\d+))?
           """ % substitutions, re.MULTILINE|re.VERBOSE)
 
-    re_PlayerInfo   = re.compile(u"""
+    re_PlayerInfo   = re.compile("""
           ^Seat\s(?P<SEAT>[0-9]+):\s
           (?P<PNAME>.*)\s
           \(\s(%(LS)s)?\s?(?P<CASH>[%(NUM)s]+)\s?(%(LS)s)?\s\)""" % substitutions, 
@@ -124,16 +124,16 @@ class PacificPoker(HandHistoryConverter):
           Seat\s(?P<BUTTON>[0-9]+)\sis\sthe\sbutton
           """ % substitutions, re.MULTILINE|re.VERBOSE)
 
-    re_Identify     = re.compile(u'\*{4,5}\s(Cassava|888poker|888)(\.[a-z]{2})?\s(Snap\sPoker\s|BLAST\s)?Hand\sHistory\sfor\sGame\s\d+\s')
+    re_Identify     = re.compile('\*{4,5}\s(Cassava|888poker|888)(\.[a-z]{2})?\s(Snap\sPoker\s|BLAST\s)?Hand\sHistory\sfor\sGame\s\d+\s')
     re_SplitHands   = re.compile('\n\n+')
     re_TailSplitHands   = re.compile('(\n\n\n+)')
     re_Button       = re.compile('Seat (?P<BUTTON>\d+) is the button', re.MULTILINE)
-    re_Board        = re.compile(u"\[\s(?P<CARDS>.+)\s\]")
-    re_Spanish_10   = re.compile(u'D([tpeo])')
+    re_Board        = re.compile("\[\s(?P<CARDS>.+)\s\]")
+    re_Spanish_10   = re.compile('D([tpeo])')
 
     re_DateTime     = re.compile("""(?P<D>[0-9]{2})\s(?P<M>[0-9]{2})\s(?P<Y>[0-9]{4})[\- ]+(?P<H>[0-9]+):(?P<MIN>[0-9]+):(?P<S>[0-9]+)""", re.MULTILINE)
 
-    short_subst = {'PLYR': r'(?P<PNAME>.+?)', 'CUR': '\$?', 'NUM' : u".,\d\xa0"}
+    short_subst = {'PLYR': r'(?P<PNAME>.+?)', 'CUR': '\$?', 'NUM' : ".,\d\xa0"}
     re_PostSB           = re.compile(r"^%(PLYR)s posts small blind \[(%(CUR)s)?\s?(?P<SB>[%(NUM)s]+)\s?(%(CUR)s)?\]" %  substitutions, re.MULTILINE)
     re_PostBB           = re.compile(r"^%(PLYR)s posts big blind \[(%(CUR)s)?\s?(?P<BB>[%(NUM)s]+)\s?(%(CUR)s)?\]" %  substitutions, re.MULTILINE)
     re_Antes            = re.compile(r"^%(PLYR)s posts (the\s)?ante \[(%(CUR)s)?\s?(?P<ANTE>[%(NUM)s]+)\s?(%(CUR)s)?\]" % substitutions, re.MULTILINE)
@@ -254,7 +254,7 @@ class PacificPoker(HandHistoryConverter):
                 else: 
                     if info['BUYIN'].find("$")!=-1:
                         hand.buyinCurrency="USD"
-                    elif info['BUYIN'].find(u"€")!=-1:
+                    elif info['BUYIN'].find("€")!=-1:
                         hand.buyinCurrency="EUR"
                     elif 'PLAY' in info and info['PLAY'] != "Practice Play" and info['PLAY'] != "Play Money":
                         hand.buyinCurrency="FREE"
@@ -263,13 +263,13 @@ class PacificPoker(HandHistoryConverter):
                         log.error(_("PacificPokerToFpdb.readHandInfo: Failed to detect currency.") + " Hand ID: %s: '%s'" % (hand.handid, info[key]))
                         raise FpdbParseError
 
-                    info['BIAMT'] = self.clearMoneyString(info['BIAMT'].strip(u'$€'))
+                    info['BIAMT'] = self.clearMoneyString(info['BIAMT'].strip('$€'))
                     hand.buyin = int(100*Decimal(info['BIAMT']))
                     
                     if info['BIRAKE'] is None:
                         hand.fee = 0
                     else:
-                        info['BIRAKE'] = self.clearMoneyString(info['BIRAKE'].strip(u'$€'))
+                        info['BIRAKE'] = self.clearMoneyString(info['BIRAKE'].strip('$€'))
                         hand.fee = int(100*Decimal(info['BIRAKE']))
 
             if key == 'TABLE' and info['TABLE'] != None:
@@ -389,7 +389,7 @@ class PacificPoker(HandHistoryConverter):
 #    streets PREFLOP, PREDRAW, and THIRD are special cases beacause
 #    we need to grab hero's cards
         for street in ('PREFLOP', 'DEAL'):
-            if street in hand.streets.keys():
+            if street in list(hand.streets.keys()):
                 m = self.re_HeroCards.finditer(hand.streets[street])
                 for found in m:
 #                    if m == None:
@@ -399,7 +399,7 @@ class PacificPoker(HandHistoryConverter):
                     newcards = self.splitCards(found.group('NEWCARDS'))
                     hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
 
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             for found in m:
@@ -496,29 +496,29 @@ class PacificPoker(HandHistoryConverter):
                 
     def splitCards(self, cards):
         #Polish
-        cards = cards.replace(u'Kreuz', 'c')
-        cards = cards.replace(u'Karo', 'd')
-        cards = cards.replace(u'Pik', 's')
-        cards = cards.replace(u'Herz', 'h')
-        cards = cards.replace(u'10', 'T')
+        cards = cards.replace('Kreuz', 'c')
+        cards = cards.replace('Karo', 'd')
+        cards = cards.replace('Pik', 's')
+        cards = cards.replace('Herz', 'h')
+        cards = cards.replace('10', 'T')
         #Russian
-        cards = cards.replace(u'\xd2', 'Q')
-        cards = cards.replace(u'\xc2', 'A')
-        cards = cards.replace(u'\xc4', 'J')
+        cards = cards.replace('\xd2', 'Q')
+        cards = cards.replace('\xc2', 'A')
+        cards = cards.replace('\xc4', 'J')
         #Spanish
         cards = self.re_Spanish_10.sub('T\g<1>', cards)
-        cards = cards.replace(u't', 'h')
-        cards = cards.replace(u'p', 's')
-        cards = cards.replace(u'e', 'd')
-        cards = cards.replace(u'o', 'h')
+        cards = cards.replace('t', 'h')
+        cards = cards.replace('p', 's')
+        cards = cards.replace('e', 'd')
+        cards = cards.replace('o', 'h')
         #Dutch
-        cards = cards.replace(u'B', 'J')
-        cards = cards.replace(u'V', 'Q')
-        cards = cards.replace(u'H', 'K')
+        cards = cards.replace('B', 'J')
+        cards = cards.replace('V', 'Q')
+        cards = cards.replace('H', 'K')
         #Swedish
-        cards = cards.replace(u'Kn', 'J')
-        cards = cards.replace(u'D', 'Q')
-        cards = cards.replace(u'E', 'A')
+        cards = cards.replace('Kn', 'J')
+        cards = cards.replace('D', 'Q')
+        cards = cards.replace('E', 'A')
         cards = cards.split(', ')
         return cards
 

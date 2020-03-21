@@ -54,4 +54,4 @@ for line in re.split("\n", desc):
     table += "|+\n" + line + "\n"
 
 table += "|}\n"
-print table
+print(table)
