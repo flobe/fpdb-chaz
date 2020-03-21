@@ -87,7 +87,7 @@ elif sys.path[0] == "": # we are probably running directly (>>>import Configurat
     temp = os.getcwd() # should be ./pyfpdb
     FPDB_ROOT_PATH = os.path.join(temp, os.pardir)   # go up one level (to fpdbroot)
 else: # all other cases
-    FPDB_ROOT_PATH = os.path.dirname(str(sys.path[0], sys.getfilesystemencoding()))  # should be source path to /fpdbroot
+    FPDB_ROOT_PATH = sys.path[0]  # should be source path to /fpdbroot
 
 sysPlatform = platform.system()  #Linux, Windows, Darwin
 if sysPlatform[0:5] == 'Linux':
@@ -649,7 +649,7 @@ class General(dict):
         #                e.g. user could set to 4.0 for day to start at 4am local time
         # [ HH_bulk_path was here - now moved to import section ]
         for (name, value) in list(node.attributes.items()):
-            log.debug(str(_("config.general: adding %s = %s"), "utf8") % (name,value))
+            log.debug(_("config.general: adding %s = %s") % (name,value))
             self[name] = value
         
         try:
@@ -852,7 +852,7 @@ class Config:
         added,n = 1,0  # use n to prevent infinite loop if add_missing_elements() fails somehow
         while added > 0 and n < 2:
             n = n + 1
-            log.info(str(_("Reading configuration file %s"), "utf8") % file)
+            log.info(_("Reading configuration file %s") % file)
             #print (("\n"+_("Reading configuration file %s")+"\n") % file)
             try:
                 doc = xml.dom.minidom.parse(file)

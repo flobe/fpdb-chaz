@@ -151,8 +151,8 @@ _ = L10n.get_translation()
 import Configuration
 config = Configuration.Config()
 
-if config.python_version not in("2.6", "2.7"):
-    failure(_("Python 2.6-2.7 not found, please install python 2.6 or 2.7 for fpdb."))
+if config.python_version not in("3.7"):
+    failure(_("Python 3.7 not found, please install python 3.7 for fpdb."))
     
 #
 # next, check for individual modules existing
