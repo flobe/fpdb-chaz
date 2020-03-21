@@ -81,13 +81,14 @@ if hasattr(sys, "frozen"):
 else:
     INSTALL_METHOD = "source"
 
+
 if INSTALL_METHOD == "exe" or INSTALL_METHOD == "app":
     FPDB_ROOT_PATH = os.path.dirname(str(sys.executable, sys.getfilesystemencoding())) # should be exe path to \fpdbroot\pyfpdb
 elif sys.path[0] == "": # we are probably running directly (>>>import Configuration)
     temp = os.getcwd() # should be ./pyfpdb
     FPDB_ROOT_PATH = os.path.join(temp, os.pardir)   # go up one level (to fpdbroot)
 else: # all other cases
-    FPDB_ROOT_PATH = sys.path[0]  # should be source path to /fpdbroot
+    FPDB_ROOT_PATH = os.path.realpath(os.path.join(sys.path[0], os.pardir))  # should be source path to /fpdbroot
 
 sysPlatform = platform.system()  #Linux, Windows, Darwin
 if sysPlatform[0:5] == 'Linux':

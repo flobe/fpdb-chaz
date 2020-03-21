@@ -23,7 +23,6 @@ _ = L10n.get_translation()
 import sys
 from decimal_wrapper import Decimal
 import datetime
-from string import upper
 import pprint
 
 import logging
